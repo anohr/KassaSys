@@ -15,17 +15,16 @@ public class Program
 
 			if (checkInput)
 			{
-				if (menuChoice == 0)
+				switch (menuChoice)
 				{
-					break;
-				}
-				else if (menuChoice == 1)
-				{
-					Register();
-				}
-				else if (menuChoice == 2)
-				{
-					Admin();
+					case 0:
+						return;
+					case 1:
+						Register();
+						break;
+					case 2:
+						Admin();
+						break;
 				}
 			}
 		}
@@ -96,33 +95,28 @@ public class Program
 
 			if (checkInput)
 			{
-				if (menuChoice == 0)
+				switch (menuChoice)
 				{
-					break;
-				}
-				else if (menuChoice == 1)
-				{
-					product.AddProduct();
-				}
-				else if (menuChoice == 2)
-				{
-					product.UpdateProduct();
-				}
-				else if (menuChoice == 3)
-				{
-					product.RemoveProduct();
-				}
-				else if (menuChoice == 4)
-				{
-					campaine.AddCampaine();
-				}
-				else if (menuChoice == 5)
-				{
-					campaine.UpdateCampaine();
-				}
-				else if (menuChoice == 6)
-				{
-					campaine.RemoveCampaine();
+					case 0:
+						return;
+					case 1:
+						product.AddProduct();
+						break;
+					case 2:
+						product.UpdateProduct();
+						break;
+					case 3:
+						product.RemoveProduct();
+						break;
+					case 4:
+						campaine.AddCampaine();
+						break;
+					case 5:
+						campaine.UpdateCampaine();
+						break;
+					case 6:
+						campaine.RemoveCampaine();
+						break;
 				}
 			}
 		}
