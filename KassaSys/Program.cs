@@ -75,7 +75,7 @@ public class Program
 	static void Admin()
 	{
 		Product Product = new Product();
-		ShopCampaine Campaine = new ShopCampaine();
+		ShopCampaign Campaign = new ShopCampaign();
 
 		while (true)
 		{
@@ -108,13 +108,13 @@ public class Program
 						Product.RemoveProduct();
 						break;
 					case 4:
-						Campaine.AddCampaine();
+						Campaign.AddCampaign();
 						break;
 					case 5:
-						Campaine.UpdateCampaine();
+						Campaign.UpdateCampaign();
 						break;
 					case 6:
-						Campaine.RemoveCampaine();
+						Campaign.RemoveCampaign();
 						break;
 				}
 			}

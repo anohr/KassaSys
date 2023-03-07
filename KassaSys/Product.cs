@@ -48,7 +48,6 @@ public class Product
 
 		File.WriteAllLines(_filePath, stringList);
 	}
-
 	public List<ProductList> GetList()
 	{
 		return FetchProductFromFile();
@@ -74,7 +73,7 @@ public class Product
 
 		while (true)
 		{
-			Console.Write("   Ange namn: ");
+			Console.Write("   Ange produkt namn: ");
 			name = Console.ReadLine();
 
 			if (name == "0")
@@ -89,7 +88,7 @@ public class Product
 
 		while (true)
 		{
-			Console.Write("   Ange pris (ex 12,34): ");
+			Console.Write("   Ange produkt pris (ex 12,34): ");
 			double.TryParse(Console.ReadLine(), out price);
 
 			if (price == 0)
@@ -164,7 +163,7 @@ public class Product
 
 			while (true)
 			{
-				Console.Write("  Välj ID: ");
+				Console.Write("  Välj produkt ID: ");
 				int.TryParse(Console.ReadLine(), out productID);
 
 				if (productID == 0)
@@ -181,7 +180,7 @@ public class Product
 
 			while (true)
 			{
-				Console.Write($"    Ange nytt namn på ({FetchProductName(productID)}): ");
+				Console.Write($"    Ange nytt produkt namn på ({FetchProductName(productID)}): ");
 				newName = Console.ReadLine();
 
 				if (newName == "0")
@@ -196,7 +195,7 @@ public class Product
 
 			while (true)
 			{
-				Console.Write($"    Ange nytt pris (tidigare: {FetchProductPrice(productID):F2}): ");
+				Console.Write($"    Ange nytt produkt pris (tidigare: {FetchProductPrice(productID):F2}): ");
 				double.TryParse(Console.ReadLine(), out newPrice);
 
 				if (newPrice == 0)
@@ -218,6 +217,7 @@ public class Product
 			SaveAllToFile(ProductList);
 		}
 	}
+
 	public void RemoveProduct()
 	{
 		while (true)
@@ -248,7 +248,7 @@ public class Product
 
 			while (true)
 			{
-				Console.Write("  Välj ID: ");
+				Console.Write("  Välj produkt ID: ");
 				int.TryParse(Console.ReadLine(), out productID);
 
 				if (productID == 0)
@@ -268,9 +268,9 @@ public class Product
 
 			SaveAllToFile(ProductList);
 
-			ShopCampaine campaineList = new ShopCampaine();
+			ShopCampaign campaignList = new ShopCampaign();
 
-			campaineList.RemoveCampaineId(productID);
+			campaignList.RemoveCampaignId(productID);
 		}
 	}
 }

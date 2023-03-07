@@ -1,6 +1,6 @@
 ﻿namespace KassaSys;
 
-public class CampaineList
+public class CampaignList
 {
 	public int Id { get; set; }
 	public int ProductID { get; set; }

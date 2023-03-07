@@ -10,7 +10,7 @@ public class CashRegister
 	private string _receiptEnd = "&&==END==&&";
 
 	Product ProductList = new Product();
-	ShopCampaine CampaineList = new ShopCampaine();
+	ShopCampaign CampaignList = new ShopCampaign();
 
 	public int FetchTotalReceipts()
 	{
@@ -47,13 +47,12 @@ public class CashRegister
 	}
 	public double FetchTotalPrice()
 	{
-		return _receiptList.Sum(receipt => receipt.Count * (receipt.Price - receipt.Discount));
+		return _receiptList.Sum(receipt => (receipt.Count * receipt.Price * receipt.Discount));
 	}
 	public bool CheckIfProductAdded(int id)
 	{
 		return _receiptList.Any(receipt => receipt.Id == id);
 	}
-
 	public void UpdateProductInReceipt(int id, int amount)
 	{
 		_receiptList.Where(receipt => receipt.Id == id).ToList().ForEach(receipt =>
@@ -69,7 +68,6 @@ public class CashRegister
 			}
 		});
 	}
-
 	public void AddToReceipt(int id, int amount)
 	{
 		if (amount < 0)
@@ -78,7 +76,7 @@ public class CashRegister
 		if (!CheckIfProductExists(id))
 			return;
 
-		double campaine = CampaineList.GetList().OrderBy(discount => discount.StartDate).Where(discount => discount.ProductID == id && (discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now)).Select(discount => discount.Discount).FirstOrDefault();
+		double campaine = CampaignList.GetList().OrderBy(discount => discount.StartDate).Where(discount => discount.ProductID == id && (discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now)).Select(discount => discount.Discount).FirstOrDefault();
 
 		if (!CheckIfProductAdded(id))
 		{
@@ -89,19 +87,26 @@ public class CashRegister
 			UpdateProductInReceipt(id, amount);
 		}
 	}
-
 	public void PrintReceipt()
 	{
 		foreach (var item in _receiptList)
 		{
 			Console.WriteLine($"{item.Name} {item.Count} {item.Type} * {item.Price:F2} = {(Math.Round(item.Count * item.Price, 2)):F2}");
-			if (item.Discount > 0)
+			if (item.Discount < 1 && item.Discount != 0)
 			{
-				Console.WriteLine($"   Rabatt: -{item.Count * item.Discount:F2}");
+				double discount = item.Discount;
+				discount *= 100;
+				discount -= 100;
+				discount *= -1;
+
+				Console.WriteLine($"   Rabatt: {discount}% -{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}kr");
+			}
+			if (item.Discount >= 1)
+			{
+				Console.WriteLine($"   Rabatt: -{item.Price * item.Discount:F2}kr");
 			}
 		}
 	}
-
 	public void SaveReceipt()
 	{
 		if (!File.Exists(_filePath))
