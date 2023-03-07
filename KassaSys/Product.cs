@@ -10,9 +10,9 @@ public class Product
 
 	public Product()
 	{
-		ProductList = InitializeFromFile();
+		ProductList = FetchProductFromFile();
 	}
-	public List<ProductList> InitializeFromFile()
+	public List<ProductList> FetchProductFromFile()
 	{
 		var tempProductList = new List<ProductList>();
 
@@ -49,7 +49,7 @@ public class Product
 
 	public List<ProductList> GetList()
 	{
-		return InitializeFromFile();
+		return FetchProductFromFile();
 	}
 	public string FetchProductName(int id)
 	{

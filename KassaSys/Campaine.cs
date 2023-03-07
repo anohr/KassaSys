@@ -12,7 +12,7 @@ public class ShopCampaine
 
 	public ShopCampaine()
 	{
-		_campaineList = InitializeFromFile();
+		_campaineList = FetchCampaineFromFile();
 
 		/*
 		 *
@@ -22,7 +22,7 @@ public class ShopCampaine
 		 *
 		 */
 	}
-	public List<CampaineList> InitializeFromFile()
+	public List<CampaineList> FetchCampaineFromFile()
 	{
 		var tempCampaineList = new List<CampaineList>();
 
@@ -66,12 +66,12 @@ public class ShopCampaine
 		});
 
 		SaveAllToFile(_campaineList);
-		_campaineList = InitializeFromFile();
+		_campaineList = FetchCampaineFromFile();
 	}
 
 	public List<CampaineList> GetList()
 	{
-		return InitializeFromFile();
+		return FetchCampaineFromFile();
 	}
 	public void AddCampaine()
 	{
