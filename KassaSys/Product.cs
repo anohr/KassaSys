@@ -147,7 +147,7 @@ public class Product
 
 			foreach (var product in ProductList)
 			{
-				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price:F2} / {product.Type}");
+				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price:F2} per {product.Type}");
 			}
 
 			if (ProductList.Count == 0)
