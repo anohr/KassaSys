@@ -32,8 +32,7 @@ public class Program
 
 	static void Register()
 	{
-		Product product = new Product();
-		CashRegister cashRegister = new CashRegister();
+		CashRegister CashRegister = new CashRegister();
 
 		while (true)
 		{
@@ -43,11 +42,11 @@ public class Program
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.BackgroundColor = ConsoleColor.Red;
 
-			Console.WriteLine($"KVITTO  #{cashRegister.FetchTotalReceipts():D4}  {DateTime.Now}");
+			Console.WriteLine($"KVITTO  #{CashRegister.FetchTotalReceipts():D4}  {DateTime.Now}");
 
-			cashRegister.PrintReceipt();
+			CashRegister.PrintReceipt();
 
-			Console.WriteLine($"Total: {cashRegister.FetchTotalPrice():F2}");
+			Console.WriteLine($"Total: {CashRegister.FetchTotalPrice():F2}");
 
 			Console.ResetColor();
 
@@ -57,8 +56,8 @@ public class Program
 
 			if (inputToCheck.ToLower() == "pay")
 			{
-				cashRegister.SaveReceipt();
-				cashRegister = new CashRegister();
+				CashRegister.SaveReceipt();
+				CashRegister = new CashRegister();
 				return;
 			}
 			else if (inputToCheck.Contains(" "))
@@ -67,7 +66,7 @@ public class Program
 
 				if (int.TryParse(args[0], out int productID) && int.TryParse(args[1], out int productAmount))
 				{
-					cashRegister.AddToReceipt(productID, productAmount);
+					CashRegister.AddToReceipt(productID, productAmount);
 				}
 			}
 		}
@@ -75,8 +74,8 @@ public class Program
 
 	static void Admin()
 	{
-		Product product = new Product();
-		ShopCampaine campaine = new ShopCampaine();
+		Product Product = new Product();
+		ShopCampaine Campaine = new ShopCampaine();
 
 		while (true)
 		{
@@ -100,22 +99,22 @@ public class Program
 					case 0:
 						return;
 					case 1:
-						product.AddProduct();
+						Product.AddProduct();
 						break;
 					case 2:
-						product.UpdateProduct();
+						Product.UpdateProduct();
 						break;
 					case 3:
-						product.RemoveProduct();
+						Product.RemoveProduct();
 						break;
 					case 4:
-						campaine.AddCampaine();
+						Campaine.AddCampaine();
 						break;
 					case 5:
-						campaine.UpdateCampaine();
+						Campaine.UpdateCampaine();
 						break;
 					case 6:
-						campaine.RemoveCampaine();
+						Campaine.RemoveCampaine();
 						break;
 				}
 			}
