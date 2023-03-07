@@ -4,42 +4,35 @@ namespace KassaSys;
 
 public class ShopCampaine
 {
-	private List<CampaineList> campaineList = new List<CampaineList>();
+	private List<CampaineList> _campaineList = new List<CampaineList>();
 
-	Product productList = new Product();
+	Product ProductList = new Product();
 
 	public ShopCampaine()
 	{
 		/*
 		 *
 		 *   SPARA TILL FIL !!!!
-		 *   ta bort produkt, kampanj etc där saker överlappar
-		 *   skriv ut i kvittot att det är rabatt
+		 *   när man tar bort produkt ta bort relationer i  kampanj etc där saker överlappar
+		 *   kolla om det är % eller kr rabatten ska vara i
+		 *   string TempCampaine = $"{id}%&%{productID}%&%{DateTime.Now}%&%{10}%&%{7}";
+		 *
+		 *   https://stackoverflow.com/questions/3717028/access-list-from-another-class#3717187
 		 *
 		 */
-		campaineList.Add(new CampaineList { Id = 1, ProductID = 1, StartDate = DateTime.Now, EndDate = 10, Discount = 7 });
-		campaineList.Add(new CampaineList { Id = 2, ProductID = 2, StartDate = DateTime.Now, EndDate = 3, Discount = 1 });
-		campaineList.Add(new CampaineList { Id = 3, ProductID = 7, StartDate = DateTime.Now, EndDate = 10, Discount = 3 });
+		/*_campaineList.Add(new CampaineList { Id = 1, ProductID = 1, StartDate = DateTime.Now.AddDays(-2), EndDate = 10, Discount = 7 });
+		_campaineList.Add(new CampaineList { Id = 2, ProductID = 2, StartDate = DateTime.Now, EndDate = 3, Discount = 1 });
+		_campaineList.Add(new CampaineList { Id = 3, ProductID = 7, StartDate = DateTime.Now.AddDays(3), EndDate = 10, Discount = 3 });*/
 	}
 	public List<CampaineList> GetList()
 	{
-		return campaineList;
+		return _campaineList;
 	}
-
-	public double FetchCampaineDiscount(int Id)
-	{
-		var discounted = campaineList.OrderBy(discount => discount.StartDate).Where(discount => discount.ProductID == Id).Select(discount => discount.Discount).FirstOrDefault();
-
-		Console.WriteLine(discounted);
-
-		return 0.0;
-	}
-
 	public void AddCampaine()
 	{
-		int id = (campaineList.Count > 0) ? campaineList.Last().Id + 1 : 1;
-		int campaineId = 0;
-		double discount = 0;
+		int id = (_campaineList.Count > 0) ? _campaineList.Last().Id + 1 : 1;
+		int campaineID;
+		double discount;
 		DateTime startDate;
 		int endDate;
 
@@ -52,19 +45,30 @@ public class ShopCampaine
 			int i = 1;
 			Console.WriteLine("    Ange produkt till din kampanj: \n");
 			Console.WriteLine("    {0,-3} {1,-20} {2}\n", "Id", "Produkt namn", "Pris");
-			foreach (var product in productList.GetList())
+
+			foreach (var product in ProductList.GetList())
 			{
 				Console.WriteLine($"    {product.Id,-3} {product.Name,-20} {product.Price:F2}");
 				i++;
 			}
-			Console.Write("\n  Välj ID: ");
-			int.TryParse(Console.ReadLine(), out campaineId);
 
-			if (campaineId == 0)
+			if (ProductList.GetList().Count == 0)
+			{
+				Console.WriteLine("     Inga produkter att lägga kampanj på...\n");
+				Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
+				Console.ReadKey();
+
+				return;
+			}
+
+			Console.Write("\n  Välj ID: ");
+			int.TryParse(Console.ReadLine(), out campaineID);
+
+			if (campaineID == 0)
 			{
 				return;
 			}
-			else if (campaineId > 0)
+			else if (campaineID > 0)
 			{
 				break;
 			}
@@ -72,10 +76,10 @@ public class ShopCampaine
 
 		while (true)
 		{
+			string format = "yyyy-MM-dd";
+
 			Console.Write("  Ange start datum (YYYY-MM-DD): ");
 			string inputDate = Console.ReadLine();
-
-			string format = "yyyy-MM-dd";
 
 			if (inputDate == "0")
 			{
@@ -99,7 +103,6 @@ public class ShopCampaine
 			{
 				return;
 			}
-
 			if (endDate > 0)
 			{
 				break;
@@ -115,22 +118,23 @@ public class ShopCampaine
 			{
 				return;
 			}
-
-			if (discount > 0 && productList.FetchProductPrice(campaineId)! > discount)
+			if (discount > 0 && ProductList.FetchProductPrice(campaineID)! > discount)
 			{
 				break;
 			}
 		}
 
-		campaineList.Add(new CampaineList { Id = id, ProductID = campaineId, StartDate = startDate, EndDate = endDate, Discount = discount });
-		;
+		_campaineList.Add(new CampaineList { Id = id, ProductID = campaineID, StartDate = startDate, EndDate = endDate, Discount = discount });
 	}
 
 	public void UpdateCampaine()
 	{
 		while (true)
 		{
-			int pID = 0;
+			int campaineID;
+			DateTime startDate;
+			int endDate;
+			double discount;
 
 			Console.Clear();
 			Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -138,16 +142,18 @@ public class ShopCampaine
 
 			Console.WriteLine("    {0,-3} {1,-15} {2,-10}    {3,-10} {4}\n", "Id", "Produktnamn", "Start", "Slut", "Rabatt");
 
-			if (campaineList.Count > 0)
+			foreach (var campaine in _campaineList)
 			{
-				foreach (var campaine in campaineList)
-				{
-					Console.WriteLine($"    {campaine.Id,-3} {productList.FetchProductName(campaine.ProductID),-15} {campaine.StartDate.ToString("yyyy-MM-dd")} -> {campaine.StartDate.AddDays(campaine.EndDate).ToString("yyyy-MM-dd")} {campaine.Discount} kr");
-				}
+				Console.WriteLine($"    {campaine.Id,-3} {ProductList.FetchProductName(campaine.ProductID),-15} {campaine.StartDate.ToString("yyyy-MM-dd")} -> {campaine.StartDate.AddDays(campaine.EndDate).ToString("yyyy-MM-dd")} {campaine.Discount} kr");
 			}
-			else
+
+			if (_campaineList.Count == 0)
 			{
-				Console.WriteLine("    Inga kampanjer i registret...");
+				Console.WriteLine("     Inga kampanjer att uppdatera...\n");
+				Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
+				Console.ReadKey();
+
+				return;
 			}
 
 			Console.Write("\n");
@@ -155,28 +161,26 @@ public class ShopCampaine
 			while (true)
 			{
 				Console.Write("  Välj ID: ");
-				bool check = int.TryParse(Console.ReadLine(), out pID);
+				int.TryParse(Console.ReadLine(), out campaineID);
 
-				if (pID > 0)
-				{
-					break;
-				}
-				if (pID == 0)
+				if (campaineID == 0)
 				{
 					return;
+				}
+				if (campaineID > 0)
+				{
+					break;
 				}
 			}
 
 			Console.Write("\n");
 
-			DateTime startDate;
-
 			while (true)
 			{
-				Console.Write($"  Ange nytt start datum för kampanjen med ({productList.FetchProductName(pID)}): ");
-				string inputDate = Console.ReadLine();
-
 				string format = "yyyy-MM-dd";
+
+				Console.Write($"  Ange nytt start datum för kampanjen med ({ProductList.FetchProductName(campaineID)}): ");
+				string inputDate = Console.ReadLine();
 
 				if (inputDate == "0")
 				{
@@ -191,25 +195,20 @@ public class ShopCampaine
 				}
 			}
 
-			int endDate;
-
 			while (true)
 			{
-				Console.Write($"  Ange hur många dagar kampanje ska gälla för ({productList.FetchProductName(pID)}): ");
+				Console.Write($"  Ange hur många dagar kampanje ska gälla för ({ProductList.FetchProductName(campaineID)}): ");
 				int.TryParse(Console.ReadLine(), out endDate);
 
 				if (endDate == 0)
 				{
 					return;
 				}
-
 				if (endDate > 0)
 				{
 					break;
 				}
 			}
-
-			double discount;
 
 			while (true)
 			{
@@ -220,14 +219,13 @@ public class ShopCampaine
 				{
 					return;
 				}
-
-				if (discount > 0 && productList.FetchProductPrice(pID)! > discount)
+				if (discount > 0 && ProductList.FetchProductPrice(campaineID)! > discount)
 				{
 					break;
 				}
 			}
 
-			campaineList.Where(campaine => campaine.Id == pID).ToList().ForEach(campaine =>
+			_campaineList.Where(campaine => campaine.Id == campaineID).ToList().ForEach(campaine =>
 			{
 				campaine.StartDate = startDate;
 				campaine.EndDate = endDate;
@@ -240,7 +238,7 @@ public class ShopCampaine
 	{
 		while (true)
 		{
-			int pID = 0;
+			int campaineID;
 
 			Console.Clear();
 			Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -248,16 +246,19 @@ public class ShopCampaine
 
 			Console.WriteLine("    {0,-3} {1,-15} {2,-10}    {3,-10} {4}\n", "Id", "Produktnamn", "Start", "Slut", "Rabatt");
 
-			if (campaineList.Count > 0)
+
+			foreach (var campaine in _campaineList)
 			{
-				foreach (var campaine in campaineList)
-				{
-					Console.WriteLine($"    {campaine.Id,-3} {productList.FetchProductName(campaine.ProductID),-15} {campaine.StartDate.ToString("yyyy-MM-dd")} -> {campaine.StartDate.AddDays(campaine.EndDate).ToString("yyyy-MM-dd")} {campaine.Discount} kr");
-				}
+				Console.WriteLine($"    {campaine.Id,-3} {ProductList.FetchProductName(campaine.ProductID),-15} {campaine.StartDate.ToString("yyyy-MM-dd")} -> {campaine.StartDate.AddDays(campaine.EndDate).ToString("yyyy-MM-dd")} {campaine.Discount} kr");
 			}
-			else
+
+			if (_campaineList.Count == 0)
 			{
-				Console.WriteLine("    Inga kampanjer i registret...");
+				Console.WriteLine("     Inga kampanjer att ta bort...\n");
+				Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
+				Console.ReadKey();
+
+				return;
 			}
 
 			Console.Write("\n");
@@ -265,21 +266,21 @@ public class ShopCampaine
 			while (true)
 			{
 				Console.Write("  Välj ID: ");
-				bool check = int.TryParse(Console.ReadLine(), out pID);
+				int.TryParse(Console.ReadLine(), out campaineID);
 
-				if (pID > 0)
-				{
-					break;
-				}
-				if (pID == 0)
+				if (campaineID == 0)
 				{
 					return;
 				}
+				if (campaineID > 0)
+				{
+					break;
+				}
 			}
 
-			campaineList.Where(campaine => campaine.Id == pID).ToList().ForEach(campaine =>
+			_campaineList.Where(campaine => campaine.Id == campaineID).ToList().ForEach(campaine =>
 			{
-				campaineList.Remove(campaine);
+				_campaineList.Remove(campaine);
 			});
 		}
 	}

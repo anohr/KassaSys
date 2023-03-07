@@ -47,7 +47,7 @@ public class Program
 
 			cashRegister.PrintReceipt();
 
-			Console.WriteLine($"Total: {cashRegister.FetchTotal():F2}");
+			Console.WriteLine($"Total: {cashRegister.FetchTotalPrice():F2}");
 
 			Console.ResetColor();
 

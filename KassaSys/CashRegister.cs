@@ -4,60 +4,59 @@ namespace KassaSys;
 
 public class CashRegister
 {
-	private List<CashRegisterList> receiptList = new List<CashRegisterList>();
-	private string DirPath = @".\receipts";
-	private string FilePath = @".\receipts\receipt_" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
-	private string ReceiptEnd = "&&==END==&&";
+	private List<CashRegisterList> _receiptList = new List<CashRegisterList>();
+	private string _dirPath = @".\receipts";
+	private string _filePath = @".\receipts\receipt_" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
+	private string _receiptEnd = "&&==END==&&";
 
-	Product productList = new Product();
-	ShopCampaine campaineList = new ShopCampaine();
+	Product ProductList = new Product();
+	ShopCampaine CampaineList = new ShopCampaine();
 
 	public int FetchTotalReceipts()
 	{
-		if (!Directory.Exists(DirPath))
+		int countReceipts = 1;
+
+		if (!Directory.Exists(_dirPath))
 		{
-			Directory.CreateDirectory(DirPath);
+			Directory.CreateDirectory(_dirPath);
 		}
 
-		int count = 1;
-		foreach (string file in Directory.GetFiles(DirPath))
+		foreach (string file in Directory.GetFiles(_dirPath))
 		{
-			int endCount = File.ReadLines(file).Count(line => line.Contains(ReceiptEnd));
-			count += endCount;
+			countReceipts += File.ReadLines(file).Count(line => line.Contains(_receiptEnd));
 		}
 
-		return count;
+		return countReceipts;
 	}
 
 	private string FetchProductName(int id)
 	{
-		return productList.GetList().Where(product => product.Id == id).Select(product => product.Name).FirstOrDefault();
+		return ProductList.GetList().Where(product => product.Id == id).Select(product => product.Name).FirstOrDefault();
 	}
 	private double FetchProductPrice(int id)
 	{
-		return productList.GetList().Where(product => product.Id == id).Select(product => product.Price).FirstOrDefault();
+		return ProductList.GetList().Where(product => product.Id == id).Select(product => product.Price).FirstOrDefault();
 	}
 	private ProductType FetchProductType(int id)
 	{
-		return productList.GetList().Where(product => product.Id == id).Select(product => product.Type).FirstOrDefault();
+		return ProductList.GetList().Where(product => product.Id == id).Select(product => product.Type).FirstOrDefault();
 	}
 	public bool CheckIfProductExists(int id)
 	{
-		return productList.GetList().Any(product => product.Id == id);
+		return ProductList.GetList().Any(product => product.Id == id);
 	}
-
-	public double FetchTotal()
+	public double FetchTotalPrice()
 	{
-		return receiptList.Sum(receipt => receipt.Count * (receipt.Price - receipt.Discount));
+		return _receiptList.Sum(receipt => receipt.Count * (receipt.Price - receipt.Discount));
 	}
 	public bool CheckIfProductAdded(int id)
 	{
-		return receiptList.Any(receipt => receipt.Id == id);
+		return _receiptList.Any(receipt => receipt.Id == id);
 	}
 
 	public void UpdateProductInReceipt(int id, int amount)
 	{
-		receiptList.Where(receipt => receipt.Id == id).ToList().ForEach(receipt =>
+		_receiptList.Where(receipt => receipt.Id == id).ToList().ForEach(receipt =>
 		{
 			int newAmount = receipt.Count += amount;
 			if (newAmount > 0)
@@ -66,7 +65,7 @@ public class CashRegister
 			}
 			else
 			{
-				receiptList.Remove(receipt);
+				_receiptList.Remove(receipt);
 			}
 		});
 	}
@@ -79,11 +78,11 @@ public class CashRegister
 		if (!CheckIfProductExists(id))
 			return;
 
-		double campaine = campaineList.GetList().Where(discount => discount.ProductID == id && (discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now)).Select(discount => discount.Discount).FirstOrDefault();
+		double campaine = CampaineList.GetList().Where(discount => discount.ProductID == id && (discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now)).Select(discount => discount.Discount).FirstOrDefault();
 
 		if (!CheckIfProductAdded(id))
 		{
-			receiptList.Add(new CashRegisterList { Id = id, Name = FetchProductName(id), Count = amount, Price = FetchProductPrice(id), Type = FetchProductType(id), Discount = campaine });
+			_receiptList.Add(new CashRegisterList { Id = id, Name = FetchProductName(id), Count = amount, Price = FetchProductPrice(id), Type = FetchProductType(id), Discount = campaine });
 		}
 		else
 		{
@@ -93,7 +92,7 @@ public class CashRegister
 
 	public void PrintReceipt()
 	{
-		foreach (var item in receiptList)
+		foreach (var item in _receiptList)
 		{
 			Console.WriteLine($"{item.Name} {item.Count} {item.Type} * {item.Price:F2} = {(Math.Round(item.Count * item.Price, 2)):F2}");
 			if (item.Discount > 0)
@@ -105,19 +104,19 @@ public class CashRegister
 
 	public void SaveReceipt()
 	{
-		if (!File.Exists(FilePath))
+		if (!File.Exists(_filePath))
 		{
-			File.Create(FilePath).Dispose();
+			File.Create(_filePath).Dispose();
 		}
 
-		if (receiptList.Count == 0)
+		if (_receiptList.Count == 0)
 		{
 			return;
 		}
 
 		string receiptString = $"KVITTO  #{FetchTotalReceipts():D4}  {DateTime.Now}\n";
 
-		foreach (var item in receiptList)
+		foreach (var item in _receiptList)
 		{
 			receiptString += $"{item.Name} {item.Count} {item.Type} * {item.Price:F2} = {(Math.Round(item.Count * item.Price, 2)):F2}\n";
 			if (item.Discount > 0)
@@ -126,9 +125,9 @@ public class CashRegister
 			}
 		}
 
-		receiptString += $"Total: {FetchTotal():F2}\n";
-		receiptString += ReceiptEnd + "\n";
+		receiptString += $"Total: {FetchTotalPrice():F2}\n";
+		receiptString += _receiptEnd + "\n";
 
-		File.AppendAllText(FilePath, receiptString);
+		File.AppendAllText(_filePath, receiptString);
 	}
 }
