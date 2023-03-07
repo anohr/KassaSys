@@ -47,7 +47,7 @@ public class CashRegister
 	}
 	public double FetchTotalPrice()
 	{
-		return _receiptList.Sum(receipt => (receipt.Count * receipt.Price * receipt.Discount));
+		return _receiptList.Sum(receipt => ((receipt.Discount < 1 ? receipt.Discount * receipt.Count * receipt.Price : receipt.Count * (receipt.Price - receipt.Discount))));
 	}
 	public bool CheckIfProductAdded(int id)
 	{
@@ -99,11 +99,11 @@ public class CashRegister
 				discount -= 100;
 				discount *= -1;
 
-				Console.WriteLine($"   Rabatt: {discount}% -{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}kr");
+				Console.WriteLine($"   Rabatt: {discount:F2}% -{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}kr");
 			}
 			if (item.Discount >= 1)
 			{
-				Console.WriteLine($"   Rabatt: -{item.Price * item.Discount:F2}kr");
+				Console.WriteLine($"   Rabatt: -{item.Count * item.Discount:F2}kr");
 			}
 		}
 	}
@@ -124,9 +124,18 @@ public class CashRegister
 		foreach (var item in _receiptList)
 		{
 			receiptString += $"{item.Name} {item.Count} {item.Type} * {item.Price:F2} = {(Math.Round(item.Count * item.Price, 2)):F2}\n";
-			if (item.Discount > 0)
+			if (item.Discount < 1 && item.Discount != 0)
 			{
-				receiptString += $"   Rabatt: -{item.Count * item.Discount:F2}\n";
+				double discount = item.Discount;
+				discount *= 100;
+				discount -= 100;
+				discount *= -1;
+
+				receiptString += $"   Rabatt: {discount:F2}% -{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}kr\n";
+			}
+			if (item.Discount >= 1)
+			{
+				receiptString += $"   Rabatt: -{item.Count * item.Discount:F2}kr\n";
 			}
 		}
 
