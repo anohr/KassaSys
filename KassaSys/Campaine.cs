@@ -4,33 +4,77 @@ namespace KassaSys;
 
 public class ShopCampaine
 {
+	private string _filePath = @".\campaine.txt";
+	private string _splitString = " | ";
 	private List<CampaineList> _campaineList = new List<CampaineList>();
 
 	Product ProductList = new Product();
 
 	public ShopCampaine()
 	{
+		_campaineList = InitializeFromFile();
+
 		/*
 		 *
-		 *   SPARA TILL FIL !!!!
-		 *   när man tar bort produkt ta bort relationer i  kampanj etc där saker överlappar
 		 *   kolla om det är % eller kr rabatten ska vara i
-		 *   string TempCampaine = $"{id}%&%{productID}%&%{DateTime.Now}%&%{10}%&%{7}";
 		 *
 		 *   https://stackoverflow.com/questions/3717028/access-list-from-another-class#3717187
 		 *
 		 */
-		/*_campaineList.Add(new CampaineList { Id = 1, ProductID = 1, StartDate = DateTime.Now.AddDays(-2), EndDate = 10, Discount = 7 });
-		_campaineList.Add(new CampaineList { Id = 2, ProductID = 2, StartDate = DateTime.Now, EndDate = 3, Discount = 1 });
-		_campaineList.Add(new CampaineList { Id = 3, ProductID = 7, StartDate = DateTime.Now.AddDays(3), EndDate = 10, Discount = 3 });*/
 	}
+	public List<CampaineList> InitializeFromFile()
+	{
+		var tempCampaineList = new List<CampaineList>();
+
+		if (!File.Exists(_filePath))
+			return tempCampaineList;
+
+		foreach (var line in File.ReadLines(_filePath))
+		{
+			var args = line.Split(_splitString);
+			var campaine = new CampaineList();
+
+			campaine.Id = Convert.ToInt32(args[0]);
+			campaine.ProductID = Convert.ToInt32(args[1]);
+			campaine.StartDate = Convert.ToDateTime(args[2]);
+			campaine.EndDate = Convert.ToInt32(args[3]);
+			campaine.Discount = Convert.ToDouble(args[4]);
+
+			tempCampaineList.Add(campaine);
+		}
+
+		return tempCampaineList;
+	}
+	public void SaveAllToFile(List<CampaineList> tempCampaineList)
+	{
+		var stringList = new List<string>();
+
+		foreach (var campaine in tempCampaineList)
+		{
+			string campaineString = $"{campaine.Id}{_splitString}{campaine.ProductID}{_splitString}{campaine.StartDate}{_splitString}{campaine.EndDate}{_splitString}{campaine.Discount}";
+			stringList.Add(campaineString);
+		}
+
+		File.WriteAllLines(_filePath, stringList);
+	}
+
+	public void RemoveCampaineId(int productId)
+	{
+		_campaineList.Where(campaine => campaine.ProductID == productId).ToList().ForEach(campaine =>
+		{
+			_campaineList.Remove(campaine);
+		});
+
+		SaveAllToFile(_campaineList);
+		_campaineList = InitializeFromFile();
+	}
+
 	public List<CampaineList> GetList()
 	{
-		return _campaineList;
+		return InitializeFromFile();
 	}
 	public void AddCampaine()
 	{
-		int id = (_campaineList.Count > 0) ? _campaineList.Last().Id + 1 : 1;
 		int campaineID;
 		double discount;
 		DateTime startDate;
@@ -96,7 +140,7 @@ public class ShopCampaine
 
 		while (true)
 		{
-			Console.Write("  Ange hur många dagar kampanje ska gälla: ");
+			Console.Write("  Ange hur många dagar kampanjen ska gälla: ");
 			int.TryParse(Console.ReadLine(), out endDate);
 
 			if (endDate == 0)
@@ -124,7 +168,9 @@ public class ShopCampaine
 			}
 		}
 
-		_campaineList.Add(new CampaineList { Id = id, ProductID = campaineID, StartDate = startDate, EndDate = endDate, Discount = discount });
+		_campaineList.Add(new CampaineList { Id = ((_campaineList.Count > 0) ? _campaineList.Last().Id + 1 : 1), ProductID = campaineID, StartDate = startDate, EndDate = endDate, Discount = discount });
+
+		SaveAllToFile(_campaineList);
 	}
 
 	public void UpdateCampaine()
@@ -197,7 +243,7 @@ public class ShopCampaine
 
 			while (true)
 			{
-				Console.Write($"  Ange hur många dagar kampanje ska gälla för ({ProductList.FetchProductName(campaineID)}): ");
+				Console.Write($"  Ange hur många dagar kampanjen ska gälla för ({ProductList.FetchProductName(campaineID)}): ");
 				int.TryParse(Console.ReadLine(), out endDate);
 
 				if (endDate == 0)
@@ -231,6 +277,8 @@ public class ShopCampaine
 				campaine.EndDate = endDate;
 				campaine.Discount = discount;
 			});
+
+			SaveAllToFile(_campaineList);
 		}
 	}
 
@@ -282,6 +330,8 @@ public class ShopCampaine
 			{
 				_campaineList.Remove(campaine);
 			});
+
+			SaveAllToFile(_campaineList);
 		}
 	}
 }

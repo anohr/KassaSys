@@ -78,7 +78,7 @@ public class CashRegister
 		if (!CheckIfProductExists(id))
 			return;
 
-		double campaine = CampaineList.GetList().Where(discount => discount.ProductID == id && (discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now)).Select(discount => discount.Discount).FirstOrDefault();
+		double campaine = CampaineList.GetList().OrderBy(discount => discount.StartDate).Where(discount => discount.ProductID == id && (discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now)).Select(discount => discount.Discount).FirstOrDefault();
 
 		if (!CheckIfProductAdded(id))
 		{

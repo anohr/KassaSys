@@ -52,7 +52,7 @@ public class Program
 
 			Console.WriteLine("kommando:\n<productid> <antal>\nPAY");
 			Console.Write("Kommando:");
-			var inputToCheck = Console.ReadLine();
+			string inputToCheck = Console.ReadLine();
 
 			if (inputToCheck.ToLower() == "pay")
 			{
@@ -86,7 +86,7 @@ public class Program
 			Console.WriteLine("    2. Uppdatera");
 			Console.WriteLine("    3. Ta bort\n");
 			Console.WriteLine(" Kampanj:");
-			Console.WriteLine("    4. Lätt till");
+			Console.WriteLine("    4. Lägg till");
 			Console.WriteLine("    5. Uppdatera");
 			Console.WriteLine("    6. Ta bort\n");
 			Console.Write(" Gör ditt val: ");

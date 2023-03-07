@@ -4,31 +4,52 @@ namespace KassaSys;
 
 public class Product
 {
+	private string _filePath = @".\product.txt";
+	private string _splitString = " | ";
 	public List<ProductList> ProductList = new List<ProductList>();
 
 	public Product()
 	{
-
-		/*
-		 *
-		 *   SPARA TILL FIL !!!!
-		 *   och ladda in den till listan sen...
-		 *
-		 */
-		/*ProductList.Add(new ProductList { Id = 1, Name = "Bananer", Price = 12.50, Type = ProductType.kg });
-		ProductList.Add(new ProductList { Id = 2, Name = "Kaffe", Price = 35.50, Type = ProductType.st });
-		ProductList.Add(new ProductList { Id = 3, Name = "Honungsmelon", Price = 17.29, Type = ProductType.kg });
-		ProductList.Add(new ProductList { Id = 4, Name = "Gurka", Price = 7.83, Type = ProductType.st });
-		ProductList.Add(new ProductList { Id = 5, Name = "Färsk lax", Price = 52.78, Type = ProductType.kg });
-		ProductList.Add(new ProductList { Id = 6, Name = "Citroner", Price = 3.84, Type = ProductType.kg });
-		ProductList.Add(new ProductList { Id = 7, Name = "Blomkål", Price = 7.78, Type = ProductType.st });
-		ProductList.Add(new ProductList { Id = 8, Name = "Kyckling", Price = 58.29, Type = ProductType.kg });
-		ProductList.Add(new ProductList { Id = 9, Name = "Mjöl", Price = 25.83, Type = ProductType.st });
-		ProductList.Add(new ProductList { Id = 10, Name = "Lammkött", Price = 82.97, Type = ProductType.st });*/
+		ProductList = InitializeFromFile();
 	}
+	public List<ProductList> InitializeFromFile()
+	{
+		var tempProductList = new List<ProductList>();
+
+		if (!File.Exists(_filePath))
+			return tempProductList;
+
+		foreach (var line in File.ReadLines(_filePath))
+		{
+			var args = line.Split(_splitString);
+			var product = new ProductList();
+
+			product.Id = Convert.ToInt32(args[0]);
+			product.Name = args[1];
+			product.Price = Convert.ToDouble(args[2]);
+			product.Type = (ProductType)Enum.ProductType.Parse(typeof(ProductType), args[3]);
+
+			tempProductList.Add(product);
+		}
+
+		return tempProductList;
+	}
+	private void SaveAllToFile(List<ProductList> tempProductList)
+	{
+		var stringList = new List<string>();
+
+		foreach (var product in tempProductList)
+		{
+			string productString = $"{product.Id}{_splitString}{product.Name}{_splitString}{product.Price}{_splitString}{product.Type}";
+			stringList.Add(productString);
+		}
+
+		File.WriteAllLines(_filePath, stringList);
+	}
+
 	public List<ProductList> GetList()
 	{
-		return ProductList;
+		return InitializeFromFile();
 	}
 	public string FetchProductName(int id)
 	{
@@ -51,14 +72,14 @@ public class Product
 
 		while (true)
 		{
-			Console.Write("   Ange namn (minst 3 tecken): ");
+			Console.Write("   Ange namn: ");
 			name = Console.ReadLine();
 
 			if (name == "0")
 			{
 				return;
 			}
-			if (name.Length >= 3)
+			if (name.Length > 0)
 			{
 				break;
 			}
@@ -66,14 +87,14 @@ public class Product
 
 		while (true)
 		{
-			Console.Write("   Ange pris: ");
+			Console.Write("   Ange pris (ex 12,34): ");
 			double.TryParse(Console.ReadLine(), out price);
 
 			if (price == 0)
 			{
 				return;
 			}
-			if (price > 0)
+			if (price >= 0)
 			{
 				break;
 			}
@@ -105,6 +126,8 @@ public class Product
 		}
 
 		ProductList.Add(new ProductList { Id = ((ProductList.Count > 0) ? ProductList.Last().Id + 1 : 1), Name = name, Price = price, Type = (ProductType)group });
+
+		SaveAllToFile(ProductList);
 	}
 
 	public void UpdateProduct()
@@ -189,6 +212,8 @@ public class Product
 				product.Name = newName;
 				product.Price = newPrice;
 			});
+
+			SaveAllToFile(ProductList);
 		}
 	}
 	public void RemoveProduct()
@@ -238,6 +263,12 @@ public class Product
 			{
 				ProductList.Remove(product);
 			});
+
+			SaveAllToFile(ProductList);
+
+			ShopCampaine campaineList = new ShopCampaine();
+
+			campaineList.RemoveCampaineId(productID);
 		}
 	}
 }
