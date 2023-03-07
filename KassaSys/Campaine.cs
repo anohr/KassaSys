@@ -27,7 +27,9 @@ public class ShopCampaine
 		var tempCampaineList = new List<CampaineList>();
 
 		if (!File.Exists(_filePath))
+		{
 			return tempCampaineList;
+		}
 
 		foreach (var line in File.ReadLines(_filePath))
 		{

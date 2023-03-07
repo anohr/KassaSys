@@ -17,7 +17,9 @@ public class Product
 		var tempProductList = new List<ProductList>();
 
 		if (!File.Exists(_filePath))
+		{
 			return tempProductList;
+		}
 
 		foreach (var line in File.ReadLines(_filePath))
 		{
