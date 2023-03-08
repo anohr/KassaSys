@@ -47,7 +47,7 @@ public class CashRegister
 	}
 	public double FetchTotalPrice()
 	{
-		return _receiptList.Sum(receipt => ((receipt.Discount < 1 ? receipt.Discount * receipt.Count * receipt.Price : receipt.Count * (receipt.Price - receipt.Discount))));
+		return _receiptList.Sum(receipt => (receipt.Discount > 1) ? ((receipt.Price - receipt.Discount) * receipt.Count) : ((receipt.Discount == 0) ? (receipt.Price * receipt.Count) : ((receipt.Discount * receipt.Price) * receipt.Count)));
 	}
 	public bool CheckIfProductAdded(int id)
 	{
@@ -91,19 +91,14 @@ public class CashRegister
 	{
 		foreach (var item in _receiptList)
 		{
-			Console.WriteLine($"{item.Name} {item.Count} {item.Type} * {item.Price:F2} = {(Math.Round(item.Count * item.Price, 2)):F2}");
+			Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", $"{item.Count} * {item.Price}", $"{(Math.Round(item.Count * item.Price, 2)):F2}");
 			if (item.Discount < 1 && item.Discount != 0)
 			{
-				double discount = item.Discount;
-				discount *= 100;
-				discount -= 100;
-				discount *= -1;
-
-				Console.WriteLine($"   Rabatt: {discount:F2}% -{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}kr");
+				Console.WriteLine("{0,11}{1,23}", "*Rabatt:", $"-{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}");
 			}
 			if (item.Discount >= 1)
 			{
-				Console.WriteLine($"   Rabatt: -{item.Count * item.Discount:F2}kr");
+				Console.WriteLine("{0,11}{1,23}", "*Rabatt:", $"-{item.Count * item.Discount:F2}");
 			}
 		}
 	}
@@ -119,28 +114,24 @@ public class CashRegister
 			return;
 		}
 
-		string receiptString = $"KVITTO  #{FetchTotalReceipts():D4}  {DateTime.Now}\n";
+		string receiptString = String.Format($"KVITTO  #{FetchTotalReceipts():D4}  {DateTime.Now}\n");
+		receiptString += String.Format("==================================\n");
 
 		foreach (var item in _receiptList)
 		{
-			receiptString += $"{item.Name} {item.Count} {item.Type} * {item.Price:F2} = {(Math.Round(item.Count * item.Price, 2)):F2}\n";
+			receiptString += String.Format("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", $"{item.Count} * {item.Price}", $"{(Math.Round(item.Count * item.Price, 2)):F2}\n");
 			if (item.Discount < 1 && item.Discount != 0)
 			{
-				double discount = item.Discount;
-				discount *= 100;
-				discount -= 100;
-				discount *= -1;
-
-				receiptString += $"   Rabatt: {discount:F2}% -{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}kr\n";
+				receiptString += String.Format("{0,11}{1,23}", "*Rabatt:", $"-{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}\n");
 			}
 			if (item.Discount >= 1)
 			{
-				receiptString += $"   Rabatt: -{item.Count * item.Discount:F2}kr\n";
+				receiptString += String.Format("{0,11}{1,23}", "*Rabatt:", $"-{item.Count * item.Discount:F2}\n");
 			}
 		}
-
-		receiptString += $"Total: {FetchTotalPrice():F2}\n";
-		receiptString += _receiptEnd + "\n";
+		receiptString += String.Format("==================================\n");
+		receiptString += String.Format("{0,34}", $"Total: {FetchTotalPrice():F2}\n");
+		receiptString += String.Format(_receiptEnd + "\n");
 
 		File.AppendAllText(_filePath, receiptString);
 	}

@@ -89,13 +89,13 @@ public class Product
 		while (true)
 		{
 			Console.Write("   Ange produkt pris (ex 12,34): ");
-			double.TryParse(Console.ReadLine(), out price);
+			bool check = double.TryParse(Console.ReadLine(), out price);
 
-			if (price == 0)
+			if (check && price == 0)
 			{
 				return;
 			}
-			if (price >= 0)
+			if (check && price > 0)
 			{
 				break;
 			}
@@ -113,13 +113,13 @@ public class Product
 			}
 
 			Console.Write("     Val: ");
-			int.TryParse(Console.ReadLine(), out group);
+			bool check = int.TryParse(Console.ReadLine(), out group);
 
-			if (group == 0)
+			if (check && group == 0)
 			{
 				return;
 			}
-			if (group > 0 && group < i)
+			if (check && (group > 0 && group < i))
 			{
 				group--;
 				break;
@@ -143,12 +143,26 @@ public class Product
 			Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
 			Console.WriteLine("  - Uppdatera namn och pris på en produkt -\n");
 
-			Console.WriteLine("    {0,-3} {1,-15} {2}\n", "Id", "Namn", "Pris");
+			Console.WriteLine("    {0,-3} {1,-15} {2,-9}\n", "Id", "Namn", "Pris");
 
+			int i = 1;
 			foreach (var product in ProductList)
 			{
-				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price:F2} per {product.Type}");
+				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,9:F2} per {product.Type}");
+
+				i++;
+
+				if (i % 2 == 0)
+				{
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+				}
+				else
+				{
+					Console.ResetColor();
+				}
 			}
+
+			Console.ResetColor();
 
 			if (ProductList.Count == 0)
 			{
@@ -164,13 +178,13 @@ public class Product
 			while (true)
 			{
 				Console.Write("  Välj produkt ID: ");
-				int.TryParse(Console.ReadLine(), out productID);
+				bool check = int.TryParse(Console.ReadLine(), out productID);
 
-				if (productID == 0)
+				if (check && productID == 0)
 				{
 					return;
 				}
-				if (productID > 0)
+				if (check && productID > 0)
 				{
 					break;
 				}
@@ -196,13 +210,13 @@ public class Product
 			while (true)
 			{
 				Console.Write($"    Ange nytt produkt pris (tidigare: {FetchProductPrice(productID):F2}): ");
-				double.TryParse(Console.ReadLine(), out newPrice);
+				bool check = double.TryParse(Console.ReadLine(), out newPrice);
 
-				if (newPrice == 0)
+				if (check && newPrice == 0)
 				{
 					return;
 				}
-				if (newPrice > 0)
+				if (check && newPrice > 0)
 				{
 					break;
 				}
@@ -230,10 +244,25 @@ public class Product
 
 			Console.WriteLine("    {0,-3} {1,-15} {2,-10} {3}\n", "Id", "Namn", "Pris", "Prisgrupp");
 
+			int i = 1;
+
 			foreach (var product in ProductList)
 			{
-				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,-10:F2} {product.Type}");
+				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,8:F2}   {product.Type}");
+
+				i++;
+
+				if (i % 2 == 0)
+				{
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+				}
+				else
+				{
+					Console.ResetColor();
+				}
 			}
+
+			Console.ResetColor();
 
 			if (ProductList.Count == 0)
 			{
@@ -249,13 +278,13 @@ public class Product
 			while (true)
 			{
 				Console.Write("  Välj produkt ID: ");
-				int.TryParse(Console.ReadLine(), out productID);
+				bool check = int.TryParse(Console.ReadLine(), out productID);
 
-				if (productID == 0)
+				if (check && productID == 0)
 				{
 					return;
 				}
-				if (productID > 0)
+				if (check && productID > 0)
 				{
 					break;
 				}
