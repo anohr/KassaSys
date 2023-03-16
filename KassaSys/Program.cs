@@ -2,14 +2,6 @@
 
 public class Program
 {
-	/*
-	 *
-	 *		Kampanjer inom samma datum span, billigast prio
-	 *		Ta bort produkt inaktiverat
-	 *		Uppdatera kampanj inaktiverat
-	 *		Styla output kvitto
-	 *
-	 */
 	static void Main()
 	{
 		while (true)
@@ -51,11 +43,11 @@ public class Program
 			Console.BackgroundColor = ConsoleColor.Red;
 
 			Console.WriteLine($"KVITTO  #{CashRegister.FetchTotalReceipts():D4}  {DateTime.Now}");
-			Console.WriteLine("==================================");
 
 			CashRegister.PrintReceipt();
 
 			Console.WriteLine("==================================");
+
 			Console.WriteLine("{0,34}", $"Total: {CashRegister.FetchTotalPrice():F2}");
 
 			Console.ResetColor();

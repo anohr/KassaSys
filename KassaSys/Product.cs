@@ -60,8 +60,16 @@ public class Product
 	{
 		return ProductList.Where(product => product.Id == id).Select(product => product.Price).FirstOrDefault();
 	}
+    public bool CheckIfProductExists(int id)
+    {
+        return ProductList.Any(product => product.Id == id);
+    }
+    public ProductType FetchProductType(int id)
+    {
+        return ProductList.Where(product => product.Id == id).Select(product => product.Type).FirstOrDefault();
+    }
 
-	public void AddProduct()
+    public void AddProduct()
 	{
 		double price;
 		int group;

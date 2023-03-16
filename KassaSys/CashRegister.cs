@@ -29,22 +29,6 @@ public class CashRegister
 		return countReceipts;
 	}
 
-	private string FetchProductName(int id)
-	{
-		return ProductList.GetList().Where(product => product.Id == id).Select(product => product.Name).FirstOrDefault();
-	}
-	private double FetchProductPrice(int id)
-	{
-		return ProductList.GetList().Where(product => product.Id == id).Select(product => product.Price).FirstOrDefault();
-	}
-	private ProductType FetchProductType(int id)
-	{
-		return ProductList.GetList().Where(product => product.Id == id).Select(product => product.Type).FirstOrDefault();
-	}
-	public bool CheckIfProductExists(int id)
-	{
-		return ProductList.GetList().Any(product => product.Id == id);
-	}
 	public double FetchTotalPrice()
 	{
 		return _receiptList.Sum(receipt => (receipt.Discount > 1) ? ((receipt.Price - receipt.Discount) * receipt.Count) : ((receipt.Discount == 0) ? (receipt.Price * receipt.Count) : ((receipt.Discount * receipt.Price) * receipt.Count)));
@@ -73,14 +57,14 @@ public class CashRegister
 		if (amount < 0)
 			return;
 
-		if (!CheckIfProductExists(id))
+		if (!ProductList.CheckIfProductExists(id))
 			return;
 
 		double campaine = CampaignList.GetList().OrderBy(discount => discount.Discount < 1 ? discount.Discount : (((discount.Discount * 100) - 100) * -1)).Where(discount => discount.ProductID == id && (discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now)).Select(discount => discount.Discount).FirstOrDefault();
 
 		if (!CheckIfProductAdded(id))
 		{
-			_receiptList.Add(new CashRegisterList { Id = id, Name = FetchProductName(id), Count = amount, Price = FetchProductPrice(id), Type = FetchProductType(id), Discount = campaine });
+			_receiptList.Add(new CashRegisterList { Id = id, Name = ProductList.FetchProductName(id), Count = amount, Price = ProductList.FetchProductPrice(id), Type = ProductList.FetchProductType(id), Discount = campaine });
 		}
 		else
 		{
@@ -89,16 +73,20 @@ public class CashRegister
 	}
 	public void PrintReceipt()
 	{
-		foreach (var item in _receiptList)
+		if (_receiptList.Count > 0)
 		{
-			Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", $"{item.Count} * {item.Price}", $"{(Math.Round(item.Count * item.Price, 2)):F2}");
-			if (item.Discount < 1 && item.Discount != 0)
+			Console.WriteLine("==================================");
+			foreach (var item in _receiptList)
 			{
-				Console.WriteLine("{0,11}{1,23}", "*Rabatt:", $"-{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}");
-			}
-			if (item.Discount >= 1)
-			{
-				Console.WriteLine("{0,11}{1,23}", "*Rabatt:", $"-{item.Count * item.Discount:F2}");
+				Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", $"{item.Count} * {item.Price:F2}", $"{(Math.Round(item.Count * item.Price, 2)):F2}");
+				if (item.Discount < 1 && item.Discount != 0)
+				{
+					Console.WriteLine("{0,11}{1,23}", "*Rabatt:", $"-{(item.Price * item.Count) - (item.Price * item.Count * item.Discount):F2}");
+				}
+				if (item.Discount >= 1)
+				{
+					Console.WriteLine("{0,11}{1,23}", "*Rabatt:", $"-{item.Count * item.Discount:F2}");
+				}
 			}
 		}
 	}
