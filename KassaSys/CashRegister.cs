@@ -4,10 +4,10 @@ namespace KassaSys;
 
 public class CashRegister
 {
-	private List<CashRegisterList> _receiptList = new List<CashRegisterList>();
 	private string _dirPath = @".\receipts";
 	private string _filePath = @".\receipts\receipt_" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
 	private string _receiptEnd = "&&==END==&&";
+	public List<CashRegisterList> _receiptList = new List<CashRegisterList>();
 
 	Product ProductList = new Product();
 	ShopCampaign CampaignList = new ShopCampaign();
@@ -31,9 +31,9 @@ public class CashRegister
 
 	public double FetchTotalPrice()
 	{
-		return _receiptList.Sum(receipt => (receipt.Discount > 1) ? ((receipt.Price - receipt.Discount) * receipt.Count) : ((receipt.Discount == 0) ? (receipt.Price * receipt.Count) : ((receipt.Discount * receipt.Price) * receipt.Count)));
+		return Math.Round(_receiptList.Sum(receipt => (receipt.Discount >= 1) ? ((receipt.Price - receipt.Discount) * receipt.Count) : ((receipt.Discount == 0) ? (receipt.Price * receipt.Count) : ((receipt.Discount * receipt.Price) * receipt.Count))), 2);
 	}
-	public bool CheckIfProductAdded(int id)
+	public bool CheckIfProductExicsts(int id)
 	{
 		return _receiptList.Any(receipt => receipt.Id == id);
 	}
@@ -62,7 +62,7 @@ public class CashRegister
 
 		double campaine = CampaignList.GetList().OrderBy(discount => discount.Discount < 1 ? discount.Discount : (((discount.Discount * 100) - 100) * -1)).Where(discount => discount.ProductID == id && (discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now)).Select(discount => discount.Discount).FirstOrDefault();
 
-		if (!CheckIfProductAdded(id))
+		if (!CheckIfProductExicsts(id))
 		{
 			_receiptList.Add(new CashRegisterList { Id = id, Name = ProductList.FetchProductName(id), Count = amount, Price = ProductList.FetchProductPrice(id), Type = ProductList.FetchProductType(id), Discount = campaine });
 		}

@@ -7,71 +7,73 @@ namespace ProductTest;
 [TestClass]
 public class ProductTest
 {
-    private readonly Product sut;
-    public List<ProductList> Products { get; set; }
+	private readonly Product sut;
+	private List<ProductList> Products { get; set; }
 
-    public ProductTest()
-    {
-        sut = new Product();
-    }
+	public ProductTest()
+	{
+		sut = new Product();
 
-    [TestMethod]
-    public void Check_productid_and_return_product_name()
-    {
-        // Arrange
-        sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
+		sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
+	}
 
-        var productId = 1;
+	[TestMethod]
+	public void Check_productid_and_return_product_name()
+	{
+		// Arrange
+		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
 
-        // Act
-        var result = sut.FetchProductName(productId);
+		var productId = 1;
 
-        // Assert
-        Assert.AreEqual("aa", result);
-    }
+		// Act
+		var result = sut.FetchProductName(productId);
 
-    [TestMethod]
-    public void Check_productid_and_return_product_price()
-    {
-        // Arrange
-        sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
+		// Assert
+		Assert.AreEqual("aa", result);
+	}
 
-        var productId = 1;
+	[TestMethod]
+	public void Check_productid_and_return_product_price()
+	{
+		// Arrange
+		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
 
-        // Act
-        var result = sut.FetchProductPrice(productId);
+		var productId = 1;
 
-        // Assert
-        Assert.AreEqual(1, result);
-    }
+		// Act
+		var result = sut.FetchProductPrice(productId);
 
-    [TestMethod]
-    public void Check_if_productid_excist()
-    {
-        // Arrange
-        sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
+		// Assert
+		Assert.AreEqual(1, result);
+	}
 
-        var productId = 1;
+	[TestMethod]
+	public void Check_productid_and_return_product_type()
+	{
+		// Arrange
+		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
 
-        // Act
-        var result = sut.CheckIfProductExists(productId);
+		var productId = 1;
 
-        // Assert
-        Assert.IsTrue(result);
-    }
+		// Act
+		var result = sut.FetchProductType(productId);
 
-    [TestMethod]
-    public void Fetch_product_type_from_productid()
-    {
-        // Arrange
-        sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
+		// Assert
+		Assert.AreEqual(ProductType.kg, result);
+	}
 
-        var productId = 1;
+	[TestMethod]
+	public void Check_productid_if_it_excist()
+	{
+		// Arrange
+		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
 
-        // Act
-        var result = sut.FetchProductType(productId);
+		var productId = 1;
 
-        // Assert
-        Assert.AreEqual(ProductType.kg, result);
-    }
+		// Act
+		var result = sut.CheckIfProductExists(productId);
+
+		// Assert
+		Assert.IsTrue(result);
+	}
 }
