@@ -8,7 +8,6 @@ namespace CashRegisterTest;
 public class CashRegisterTest
 {
 	private readonly CashRegister sut;
-	private List<CashRegisterList> CashRegister { get; set; }
 
 	public CashRegisterTest()
 	{
@@ -41,5 +40,18 @@ public class CashRegisterTest
 
 		// Assert
 		Assert.IsTrue(result);
+	}
+
+	[TestMethod]
+	public void Check_if_product_not_exicsts()
+	{
+		// Arrange
+		var productId = 4;
+
+		// Act
+		var result = sut.CheckIfProductExicsts(productId);
+
+		// Assert
+		Assert.IsFalse(result);
 	}
 }

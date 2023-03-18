@@ -60,20 +60,21 @@ public class Product
 	{
 		return ProductList.Where(product => product.Id == id).Select(product => product.Price).FirstOrDefault();
 	}
-    public bool CheckIfProductExists(int id)
-    {
-        return ProductList.Any(product => product.Id == id);
-    }
-    public ProductType FetchProductType(int id)
-    {
-        return ProductList.Where(product => product.Id == id).Select(product => product.Type).FirstOrDefault();
-    }
+	public bool CheckIfProductExists(int id)
+	{
+		return ProductList.Any(product => product.Id == id);
+	}
+	public ProductType FetchProductType(int id)
+	{
+		return ProductList.Where(product => product.Id == id).Select(product => product.Type).FirstOrDefault();
+	}
 
-    public void AddProduct()
+	public void AddProduct()
 	{
 		double price;
 		int group;
 		string name;
+		ProductType inputEnum = ProductType.kg;
 
 		Console.Clear();
 		Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -111,30 +112,36 @@ public class Product
 
 		while (true)
 		{
-			int i = 1;
-			Console.WriteLine("   Ange prisgrupp: ");
+			Console.Write("   Ange prisgrupp (");
 
+			int i = 0;
 			foreach (var type in Enum.ProductType.GetValues(typeof(ProductType)))
 			{
-				Console.WriteLine($"     {i}. {type}");
-				i++;
+				Console.Write($"{type}");
+
+				if (i == 0)
+				{
+					Console.Write(", ");
+					i++;
+				}
 			}
 
-			Console.Write("     Val: ");
-			bool check = int.TryParse(Console.ReadLine(), out group);
+			Console.Write(") : ");
 
-			if (check && group == 0)
+			string val = Console.ReadLine();
+
+			if (val == "0")
 			{
-				return;
+				break;
 			}
-			if (check && (group > 0 && group < i))
+
+			if (Enum.ProductType.TryParse(val, true, out inputEnum))
 			{
-				group--;
 				break;
 			}
 		}
 
-		ProductList.Add(new ProductList { Id = ((ProductList.Count > 0) ? ProductList.Last().Id + 1 : 1), Name = name, Price = price, Type = (ProductType)group });
+		ProductList.Add(new ProductList { Id = ((ProductList.Count > 0) ? ProductList.Last().Id + 1 : 1), Name = name, Price = price, Type = inputEnum });
 
 		SaveAllToFile(ProductList);
 	}
@@ -146,6 +153,7 @@ public class Product
 			int productID;
 			string newName;
 			double newPrice;
+			ProductType newType = ProductType.kg;
 
 			Console.Clear();
 			Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -209,7 +217,7 @@ public class Product
 				{
 					return;
 				}
-				if (newName.Length >= 3)
+				if (newName.Length > 0)
 				{
 					break;
 				}
@@ -230,10 +238,42 @@ public class Product
 				}
 			}
 
+			while (true)
+			{
+				Console.Write($"   Ange ny prisgrupp (tidigare: {FetchProductType(productID)}) (");
+
+				int j = 0;
+				foreach (var type in Enum.ProductType.GetValues(typeof(ProductType)))
+				{
+					Console.Write($"{type}");
+
+					if (j == 0)
+					{
+						Console.Write(", ");
+						j++;
+					}
+				}
+
+				Console.Write(") : ");
+
+				string val = Console.ReadLine();
+
+				if (val == "0")
+				{
+					break;
+				}
+
+				if (Enum.ProductType.TryParse(val, true, out newType))
+				{
+					break;
+				}
+			}
+
 			ProductList.Where(product => product.Id == productID).ToList().ForEach(product =>
 			{
 				product.Name = newName;
 				product.Price = newPrice;
+				product.Type = newType;
 			});
 
 			SaveAllToFile(ProductList);
