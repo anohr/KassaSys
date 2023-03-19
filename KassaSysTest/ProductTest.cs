@@ -1,18 +1,17 @@
-
-using KassaSys;
 using KassaSys.Enum;
+using KassaSys.Product;
 
 namespace ProductTest;
 
 [TestClass]
 public class ProductTest
 {
-	private readonly Product sut;
+	private readonly ShopProduct sut;
 	private List<ProductList> Products { get; set; }
 
 	public ProductTest()
 	{
-		sut = new Product();
+		sut = new ShopProduct();
 
 		sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
 		sut.ProductList.Add(new ProductList { Id = 2, Name = "bb", Price = 2, Type = ProductType.st });

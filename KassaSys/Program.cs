@@ -1,4 +1,8 @@
-﻿namespace KassaSys;
+﻿using KassaSys.Register;
+using KassaSys.Campaign;
+using KassaSys.Product;
+
+namespace KassaSys;
 
 public class Program
 {
@@ -76,7 +80,7 @@ public class Program
 
 	static void Admin()
 	{
-		Product Product = new Product();
+		ShopProduct Product = new ShopProduct();
 		ShopCampaign Campaign = new ShopCampaign();
 
 		while (true)

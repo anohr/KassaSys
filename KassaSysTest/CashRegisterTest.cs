@@ -1,5 +1,6 @@
 
 using KassaSys;
+using KassaSys.Register;
 using KassaSys.Enum;
 
 namespace CashRegisterTest;

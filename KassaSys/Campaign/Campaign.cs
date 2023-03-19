@@ -1,8 +1,8 @@
-﻿using KassaSys.Enum;
+﻿using KassaSys.Product;
 
-namespace KassaSys;
+namespace KassaSys.Campaign;
 
-public class ShopCampaign
+public class ShopCampaign : ICampaign
 {
 	private string _filePath = @".\campaign.txt";
 	private string _splitString = " | ";
@@ -68,7 +68,7 @@ public class ShopCampaign
 	}
 	public void AddCampaign()
 	{
-		Product ProductList = new Product();
+		ShopProduct ProductList = new ShopProduct();
 
 		int campaignID;
 		double discount = 0;
@@ -183,16 +183,16 @@ public class ShopCampaign
 				tempDiscount = tempDiscount.Replace("%", "").TrimEnd();
 				double.TryParse(tempDiscount, out discount);
 				discountPc = discount;
-				discount = (1 - (discount / 100));
+				discount = 1 - discount / 100;
 			}
 
-			if (discount > 0 && (ProductList.FetchProductPrice(campaignID) > discountKr || (discountPc < 100 && discountPc > 0)))
+			if (discount > 0 && (ProductList.FetchProductPrice(campaignID) > discountKr || discountPc < 100 && discountPc > 0))
 			{
 				break;
 			}
 		}
 
-		_campaignList.Add(new CampaignList { Id = ((_campaignList.Count > 0) ? _campaignList.Last().Id + 1 : 1), ProductID = campaignID, StartDate = startDate, EndDate = endDate, Discount = Math.Round(discount, 2) });
+		_campaignList.Add(new CampaignList { Id = _campaignList.Count > 0 ? _campaignList.Last().Id + 1 : 1, ProductID = campaignID, StartDate = startDate, EndDate = endDate, Discount = Math.Round(discount, 2) });
 
 		SaveAllToFile(_campaignList);
 
@@ -202,7 +202,7 @@ public class ShopCampaign
 	{
 		while (true)
 		{
-			Product ProductList = new Product();
+			ShopProduct ProductList = new ShopProduct();
 
 			int campaignID;
 			DateTime startDate;
@@ -218,9 +218,9 @@ public class ShopCampaign
 			int i = 1;
 			foreach (var campaign in _campaignList)
 			{
-				double tempDiscount = (((campaign.Discount * 100) - 100) * -1);
+				double tempDiscount = (campaign.Discount * 100 - 100) * -1;
 
-				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {((campaign.Discount >= 1) ? Math.Round(campaign.Discount, 2) + " kr" : Math.Round(tempDiscount, 2) + " %")}");
+				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount >= 1 ? Math.Round(campaign.Discount, 2) + " kr" : Math.Round(tempDiscount, 2) + " %")}");
 
 				i++;
 
@@ -320,10 +320,10 @@ public class ShopCampaign
 				{
 					tempDiscount = tempDiscount.Replace("%", "").TrimEnd();
 					check = double.TryParse(tempDiscount, out discount);
-					discount = 1 - (discount / 100);
+					discount = 1 - discount / 100;
 				}
 
-				if (check && (discount > 0 && ProductList.FetchProductPrice(campaignID)! > discount))
+				if (check && discount > 0 && ProductList.FetchProductPrice(campaignID)! > discount)
 				{
 					break;
 				}
@@ -344,7 +344,7 @@ public class ShopCampaign
 	{
 		while (true)
 		{
-			Product ProductList = new Product();
+			ShopProduct ProductList = new ShopProduct();
 
 			int campaignID;
 
@@ -357,9 +357,9 @@ public class ShopCampaign
 			int i = 1;
 			foreach (var campaign in _campaignList)
 			{
-				double tempDiscount = (((campaign.Discount * 100) - 100) * -1);
+				double tempDiscount = (campaign.Discount * 100 - 100) * -1;
 
-				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {((campaign.Discount >= 1) ? Math.Round(campaign.Discount, 2) + " kr" : Math.Round(tempDiscount, 2) + " %")}");
+				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount >= 1 ? Math.Round(campaign.Discount, 2) + " kr" : Math.Round(tempDiscount, 2) + " %")}");
 
 				i++;
 

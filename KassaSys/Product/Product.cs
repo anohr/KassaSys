@@ -1,14 +1,15 @@
 ﻿using KassaSys.Enum;
+using KassaSys.Campaign;
 
-namespace KassaSys;
+namespace KassaSys.Product;
 
-public class Product
+public class ShopProduct : IShopProducts
 {
 	private string _filePath = @".\product.txt";
 	private string _splitString = " | ";
 	public List<ProductList> ProductList = new List<ProductList>();
 
-	public Product()
+	public ShopProduct()
 	{
 		ProductList = FetchProductFromFile();
 	}
@@ -29,7 +30,7 @@ public class Product
 			product.Id = Convert.ToInt32(args[0]);
 			product.Name = args[1];
 			product.Price = Convert.ToDouble(args[2]);
-			product.Type = (ProductType)Enum.ProductType.Parse(typeof(ProductType), args[3]);
+			product.Type = (ProductType)System.Enum.Parse(typeof(ProductType), args[3]);
 
 			tempProductList.Add(product);
 		}
@@ -115,7 +116,7 @@ public class Product
 			Console.Write("   Ange prisgrupp (");
 
 			int i = 0;
-			foreach (var type in Enum.ProductType.GetValues(typeof(ProductType)))
+			foreach (var type in System.Enum.GetValues(typeof(ProductType)))
 			{
 				Console.Write($"{type}");
 
@@ -135,13 +136,13 @@ public class Product
 				break;
 			}
 
-			if (Enum.ProductType.TryParse(val, true, out inputEnum))
+			if (System.Enum.TryParse(val, true, out inputEnum))
 			{
 				break;
 			}
 		}
 
-		ProductList.Add(new ProductList { Id = ((ProductList.Count > 0) ? ProductList.Last().Id + 1 : 1), Name = name, Price = price, Type = inputEnum });
+		ProductList.Add(new ProductList { Id = ProductList.Count > 0 ? ProductList.Last().Id + 1 : 1, Name = name, Price = price, Type = inputEnum });
 
 		SaveAllToFile(ProductList);
 	}
@@ -243,7 +244,7 @@ public class Product
 				Console.Write($"   Ange ny prisgrupp (tidigare: {FetchProductType(productID)}) (");
 
 				int j = 0;
-				foreach (var type in Enum.ProductType.GetValues(typeof(ProductType)))
+				foreach (var type in System.Enum.GetValues(typeof(ProductType)))
 				{
 					Console.Write($"{type}");
 
@@ -263,7 +264,7 @@ public class Product
 					break;
 				}
 
-				if (Enum.ProductType.TryParse(val, true, out newType))
+				if (System.Enum.TryParse(val, true, out newType))
 				{
 					break;
 				}
