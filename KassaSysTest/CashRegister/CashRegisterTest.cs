@@ -1,4 +1,3 @@
-
 using KassaSys.Enum;
 
 namespace KassaSys.Register;

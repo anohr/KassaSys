@@ -44,10 +44,12 @@ public class CashRegister : ICashRegister
 	{
 		return Math.Round(_receiptList.Sum(receipt => receipt.Discount >= 1 ? (receipt.Price - receipt.Discount) * receipt.Count : receipt.Discount == 0 ? receipt.Price * receipt.Count : receipt.Discount * receipt.Price * receipt.Count), 2);
 	}
+
 	public bool CheckIfProductExicsts(int id)
 	{
 		return _receiptList.Any(receipt => receipt.Id == id);
 	}
+
 	public void UpdateProductInReceipt(int id, int amount)
 	{
 		_receiptList.Where(receipt => receipt.Id == id).ToList().ForEach(receipt =>
@@ -63,6 +65,7 @@ public class CashRegister : ICashRegister
 			}
 		});
 	}
+
 	public void AddToReceipt(int id, int amount)
 	{
 		if (amount < 0)
@@ -82,6 +85,7 @@ public class CashRegister : ICashRegister
 			UpdateProductInReceipt(id, amount);
 		}
 	}
+
 	public void PrintReceipt()
 	{
 		if (_receiptList.Count > 0)
@@ -101,6 +105,7 @@ public class CashRegister : ICashRegister
 			}
 		}
 	}
+
 	public void SaveReceipt()
 	{
 		if (!File.Exists(_filePath))

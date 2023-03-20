@@ -12,6 +12,7 @@ public class ShopCampaign : ICampaign
 	{
 		_campaignList = FetchCampaignFromFile();
 	}
+
 	public List<CampaignList> FetchCampaignFromFile()
 	{
 		var tempCampaignList = new List<CampaignList>();
@@ -37,6 +38,7 @@ public class ShopCampaign : ICampaign
 
 		return tempCampaignList;
 	}
+
 	public void SaveAllToFile(List<CampaignList> tempCampaignList)
 	{
 		var stringList = new List<string>();
@@ -51,6 +53,7 @@ public class ShopCampaign : ICampaign
 
 		_campaignList = FetchCampaignFromFile();
 	}
+
 	public void RemoveCampaignId(int productId)
 	{
 		_campaignList.Where(campaign => campaign.ProductID == productId).ToList().ForEach(campaign =>
@@ -62,10 +65,12 @@ public class ShopCampaign : ICampaign
 
 		_campaignList = FetchCampaignFromFile();
 	}
+
 	public List<CampaignList> GetList()
 	{
 		return FetchCampaignFromFile();
 	}
+
 	public void AddCampaign()
 	{
 		ShopProduct ProductList = new ShopProduct();
@@ -195,7 +200,6 @@ public class ShopCampaign : ICampaign
 		_campaignList.Add(new CampaignList { Id = _campaignList.Count > 0 ? _campaignList.Last().Id + 1 : 1, ProductID = campaignID, StartDate = startDate, EndDate = endDate, Discount = Math.Round(discount, 2) });
 
 		SaveAllToFile(_campaignList);
-
 	}
 
 	public void UpdateCampaign()

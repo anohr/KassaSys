@@ -1,5 +1,5 @@
-﻿using KassaSys.Enum;
-using KassaSys.Campaign;
+﻿using KassaSys.Campaign;
+using KassaSys.Enum;
 
 namespace KassaSys.Product;
 
@@ -13,6 +13,7 @@ public class ShopProduct : IShopProducts
 	{
 		ProductList = FetchProductFromFile();
 	}
+
 	public List<ProductList> FetchProductFromFile()
 	{
 		var tempProductList = new List<ProductList>();
@@ -37,6 +38,7 @@ public class ShopProduct : IShopProducts
 
 		return tempProductList;
 	}
+
 	private void SaveAllToFile(List<ProductList> tempProductList)
 	{
 		var stringList = new List<string>();
@@ -49,22 +51,27 @@ public class ShopProduct : IShopProducts
 
 		File.WriteAllLines(_filePath, stringList);
 	}
+
 	public List<ProductList> GetList()
 	{
 		return FetchProductFromFile();
 	}
+
 	public string FetchProductName(int id)
 	{
 		return ProductList.Where(product => product.Id == id).Select(product => product.Name).FirstOrDefault();
 	}
+
 	public double FetchProductPrice(int id)
 	{
 		return ProductList.Where(product => product.Id == id).Select(product => product.Price).FirstOrDefault();
 	}
+
 	public bool CheckIfProductExists(int id)
 	{
 		return ProductList.Any(product => product.Id == id);
 	}
+
 	public ProductType FetchProductType(int id)
 	{
 		return ProductList.Where(product => product.Id == id).Select(product => product.Type).FirstOrDefault();
