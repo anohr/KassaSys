@@ -1,5 +1,6 @@
 ﻿using KassaSys.Campaign;
 using KassaSys.Product;
+using System.Text.RegularExpressions;
 
 namespace KassaSys.Register;
 
@@ -7,7 +8,6 @@ public class CashRegister : ICashRegister
 {
 	private string _dirPath = @".\receipts";
 	private string _filePath = @".\receipts\receipt_" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
-	private string _receiptEnd = "&&==END==&&";
 	public List<CashRegisterList> _receiptList = new List<CashRegisterList>();
 
 	ShopProduct ProductList = new ShopProduct();
@@ -15,7 +15,7 @@ public class CashRegister : ICashRegister
 
 	public int FetchTotalReceipts()
 	{
-		int countReceipts = 1;
+		int countReceipts = 0;
 
 		if (!Directory.Exists(_dirPath))
 		{
@@ -24,10 +24,20 @@ public class CashRegister : ICashRegister
 
 		foreach (string file in Directory.GetFiles(_dirPath))
 		{
-			countReceipts += File.ReadLines(file).Count(line => line.Contains(_receiptEnd));
+			string lastLine = File.ReadLines(file).LastOrDefault();
+
+			if (lastLine != null && Regex.IsMatch(lastLine, @"&&==\s*(\d+)*\s==&&"))
+			{
+				int number = int.Parse(Regex.Match(lastLine, @"&&==\s*(\d+)*\s==&&").Groups[1].Value);
+
+				if (number > countReceipts)
+				{
+					countReceipts = number;
+				}
+			}
 		}
 
-		return countReceipts;
+		return countReceipts + 1;
 	}
 
 	public double FetchTotalPrice()
@@ -103,24 +113,24 @@ public class CashRegister : ICashRegister
 			return;
 		}
 
-		string receiptString = string.Format($"KVITTO  #{FetchTotalReceipts():D4}  {DateTime.Now}\n");
+		string receiptString = string.Format("\nKVITTO {0,7} {1,19}\n", $"#{FetchTotalReceipts():D4}", $"{DateTime.Now}");
 		receiptString += string.Format("==================================\n");
 
 		foreach (var item in _receiptList)
 		{
-			receiptString += string.Format("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", $"{item.Count} * {item.Price}", $"{Math.Round(item.Count * item.Price, 2):F2}\n");
+			receiptString += string.Format("{0,-13}{1,-12}{2,10}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", $"{item.Count} * {item.Price}", $"{Math.Round(item.Count * item.Price, 2):F2}\n");
 			if (item.Discount < 1 && item.Discount != 0)
 			{
-				receiptString += string.Format("{0,11}{1,23}", "*Rabatt:", $"-{item.Price * item.Count - item.Price * item.Count * item.Discount:F2}\n");
+				receiptString += string.Format("{0,11}{1,24}", "*Rabatt:", $"-{item.Price * item.Count - item.Price * item.Count * item.Discount:F2}\n");
 			}
 			if (item.Discount >= 1)
 			{
-				receiptString += string.Format("{0,11}{1,23}", "*Rabatt:", $"-{item.Count * item.Discount:F2}\n");
+				receiptString += string.Format("{0,11}{1,24}", "*Rabatt:", $"-{item.Count * item.Discount:F2}\n");
 			}
 		}
 		receiptString += string.Format("==================================\n");
-		receiptString += string.Format("{0,34}", $"Total: {FetchTotalPrice():F2}\n");
-		receiptString += string.Format(_receiptEnd + "\n");
+		receiptString += string.Format("{0,35}", $"Total: {FetchTotalPrice():F2}\n");
+		receiptString += string.Format($"&&== {FetchTotalReceipts()} ==&&");
 
 		File.AppendAllText(_filePath, receiptString);
 	}

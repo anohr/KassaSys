@@ -46,7 +46,8 @@ public class Program
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.BackgroundColor = ConsoleColor.Red;
 
-			Console.WriteLine($"KVITTO  #{CashRegister.FetchTotalReceipts():D4}  {DateTime.Now}");
+			//Console.WriteLine($"KVITTO  #{CashRegister.FetchTotalReceipts():D4}  {DateTime.Now}");
+			Console.WriteLine("KVITTO {0,7} {1,19}", $"#{CashRegister.FetchTotalReceipts():D4}", $"{DateTime.Now}");
 
 			CashRegister.PrintReceipt();
 
@@ -66,7 +67,7 @@ public class Program
 				CashRegister = new CashRegister();
 				return;
 			}
-			else if (inputToCheck.Contains(" "))
+			else if (inputToCheck.Contains(' '))
 			{
 				string[] args = inputToCheck.Split(' ');
 
