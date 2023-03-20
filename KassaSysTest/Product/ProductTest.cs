@@ -1,7 +1,7 @@
 using KassaSys.Enum;
 using KassaSys.Product;
 
-namespace ProductTest;
+namespace KassaSysTest.Product;
 
 [TestClass]
 public class ProductTest
@@ -21,8 +21,6 @@ public class ProductTest
 	public void Check_productid_and_return_product_name()
 	{
 		// Arrange
-		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
-
 		var productId = 1;
 
 		// Act
@@ -36,8 +34,6 @@ public class ProductTest
 	public void Check_not_existing_productid_and_return_null()
 	{
 		// Arrange
-		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
-
 		var productId = 2323;
 
 		// Act
@@ -51,8 +47,6 @@ public class ProductTest
 	public void Check_productid_and_return_product_price()
 	{
 		// Arrange
-		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
-
 		var productId = 1;
 
 		// Act
@@ -66,8 +60,6 @@ public class ProductTest
 	public void Check_productid_and_return_product_type()
 	{
 		// Arrange
-		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
-
 		var productId = 1;
 
 		// Act
@@ -81,8 +73,6 @@ public class ProductTest
 	public void Check_productid_if_it_excist()
 	{
 		// Arrange
-		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
-
 		var productId = 1;
 
 		// Act
@@ -96,8 +86,6 @@ public class ProductTest
 	public void Check_productid_if_it_not_excist()
 	{
 		// Arrange
-		//sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
-
 		var productId = 4;
 
 		// Act

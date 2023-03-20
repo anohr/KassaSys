@@ -1,16 +1,14 @@
 
-using KassaSys;
-using KassaSys.Register;
 using KassaSys.Enum;
 
-namespace CashRegisterTest;
+namespace KassaSys.Register;
 
 [TestClass]
-public class CashRegisterTest
+public class RegisterTest
 {
 	private readonly CashRegister sut;
 
-	public CashRegisterTest()
+	public RegisterTest()
 	{
 		sut = new CashRegister();
 
