@@ -141,11 +141,11 @@ public class CashRegister : ICashRegister
 
 				if (discountKr != 0)
 				{
-					Console.WriteLine("{0,-16}{1,18}", $"   *Rabatt: {discountKr}kr", $"-{item.Price * item.Count - item.Price * item.Count * discountKr:F2}");
+					Console.WriteLine("{0,-20}{1,14}", $"   *Rabatt: {discountKr}kr/st", $"-{discountKr * item.Count:F2}");
 				}
 				if (discountPc != 0)
 				{
-					Console.WriteLine("{0,-16}{1,18}", $"   *Rabatt: {discountPc}%", $"-{item.Count * item.Price * (discountPc / 100):F2}");
+					Console.WriteLine("{0,-20}{1,14}", $"   *Rabatt: {discountPc}%", $"-{item.Count * item.Price * (discountPc / 100):F2}");
 				}
 			}
 		}

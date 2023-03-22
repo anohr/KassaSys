@@ -51,23 +51,32 @@ public class ShopCampaign : ICampaign
 	public string GetBestDiscount(int productid)
 	{
 		var bestPercentDiscount = _campaignList
-			.Where(campaign => campaign.ProductID == productid && campaign.Discount.EndsWith("%") && campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now)
-			.OrderByDescending(campaign => double.Parse(campaign.Discount.Replace("%", "")))
-			.FirstOrDefault();
+										.Where(campaign => campaign.ProductID == productid && campaign.Discount.Contains("%") && (campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now))
+										.OrderByDescending(campaign => double.Parse(campaign.Discount.Replace("%", "")))
+										.FirstOrDefault();
 
-		string percentDiscountValue = bestPercentDiscount != null ? (bestPercentDiscount.Discount) : "0";
+		var bestMoneyDiscount = _campaignList
+									.Where(campaign => campaign.ProductID == productid && campaign.Discount.Contains("kr") && (campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now))
+									.OrderByDescending(campaign => double.Parse(campaign.Discount.Replace("kr", "")))
+									.FirstOrDefault();
 
-		var bestFixedDiscount = _campaignList
-			.Where(campaign => campaign.ProductID == productid && campaign.Discount.EndsWith("kr") && campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now)
-			.OrderByDescending(campaign => double.Parse(campaign.Discount.Replace("kr", "")))
-			.FirstOrDefault();
+		var productPrice = ProductList.GetList().Where(product => product.Id == productid)
+										.OrderByDescending(product => product.Price)
+										.FirstOrDefault();
 
-		string fixedDiscountValue = bestFixedDiscount != null ? (bestFixedDiscount.Discount) : "0";
+		var ProduPrice = productPrice.Price;
 
-		string percentDiscount = percentDiscountValue.ToString();
-		string fixedDiscount = fixedDiscountValue.ToString();
+		var bestPercent = (bestPercentDiscount != null && bestPercentDiscount.Discount != null) ? (Math.Round((1 - (double.Parse(bestPercentDiscount.Discount.Replace("%", "")) / 100)), 2) * productPrice.Price) : ProduPrice;
+		var bestMoney = (bestMoneyDiscount != null && bestMoneyDiscount.Discount != null) ? (productPrice.Price - int.Parse(bestMoneyDiscount.Discount.Replace("kr", ""))) : ProduPrice;
 
-		return (percentDiscountValue.Length > 0) ? percentDiscount : fixedDiscount;
+		if (bestMoney > bestPercent)
+		{
+			return (bestPercentDiscount != null && bestPercentDiscount.Discount != null) ? bestPercentDiscount.Discount : "0%";
+		}
+		else
+		{
+			return (bestMoneyDiscount != null && bestMoneyDiscount.Discount != null) ? bestMoneyDiscount.Discount : "0kr";
+		}
 	}
 
 	public void SaveAllToFile(List<CampaignList> tempCampaignList)
