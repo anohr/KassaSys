@@ -42,7 +42,35 @@ public class CashRegister : ICashRegister
 
 	public double FetchTotalPrice()
 	{
-		return Math.Round(_receiptList.Sum(receipt => receipt.Discount >= 1 ? (receipt.Price - receipt.Discount) * receipt.Count : receipt.Discount == 0 ? receipt.Price * receipt.Count : receipt.Discount * receipt.Price * receipt.Count), 2);
+		return Math.Round(_receiptList.Sum(receipt =>
+		{
+			string discountValue = receipt.Discount.Trim();
+			double discount = 0;
+
+			if (discountValue.EndsWith("kr"))
+			{
+				discount = double.Parse(discountValue.Trim().Replace("kr", ""));
+			}
+			else if (discountValue.EndsWith("%"))
+			{
+				double discountPercent = double.Parse(discountValue.Trim().Replace("%", ""));
+				discount = 1 - (discountPercent / 100);
+			}
+
+			double price = receipt.Price * receipt.Count;
+			double discountedPrice = price;
+
+			if (discount >= 1)
+			{
+				discountedPrice = (receipt.Price - discount) * receipt.Count;
+			}
+			else if (discount > 0 && discount < 1)
+			{
+				discountedPrice = receipt.Price * discount * receipt.Count;
+			}
+
+			return discountedPrice;
+		}), 2);
 	}
 
 	public bool CheckIfProductExicsts(int id)
@@ -69,16 +97,20 @@ public class CashRegister : ICashRegister
 	public void AddToReceipt(int id, int amount)
 	{
 		if (amount < 0)
+		{
 			return;
+		}
 
 		if (!ProductList.CheckIfProductExists(id))
+		{
 			return;
+		}
 
-		double campaine = CampaignList.GetList().OrderBy(discount => discount.Discount < 1 ? discount.Discount : (discount.Discount * 100 - 100) * -1).Where(discount => discount.ProductID == id && discount.StartDate <= DateTime.Now && discount.StartDate.AddDays(discount.EndDate) >= DateTime.Now).Select(discount => discount.Discount).FirstOrDefault();
+		string campaign = CampaignList.GetBestDiscount(id);
 
 		if (!CheckIfProductExicsts(id))
 		{
-			_receiptList.Add(new CashRegisterList { Id = id, Name = ProductList.FetchProductName(id), Count = amount, Price = ProductList.FetchProductPrice(id), Type = ProductList.FetchProductType(id), Discount = campaine });
+			_receiptList.Add(new CashRegisterList { Id = id, Name = ProductList.FetchProductName(id), Count = amount, Price = ProductList.FetchProductPrice(id), Type = ProductList.FetchProductType(id), Discount = campaign });
 		}
 		else
 		{
@@ -93,14 +125,27 @@ public class CashRegister : ICashRegister
 			Console.WriteLine("==================================");
 			foreach (var item in _receiptList)
 			{
-				Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", $"{item.Count} * {item.Price:F2}", $"{Math.Round(item.Count * item.Price, 2):F2}");
-				if (item.Discount < 1 && item.Discount != 0)
+				int discountKr = 0;
+				double discountPc = 0;
+
+				if (item.Discount.Contains("kr"))
 				{
-					Console.WriteLine("{0,11}{1,23}", "*Rabatt:", $"-{item.Price * item.Count - item.Price * item.Count * item.Discount:F2}");
+					discountKr = int.Parse(item.Discount.Replace("kr", ""));
 				}
-				if (item.Discount >= 1)
+				if (item.Discount.Contains('%'))
 				{
-					Console.WriteLine("{0,11}{1,23}", "*Rabatt:", $"-{item.Count * item.Discount:F2}");
+					discountPc = double.Parse(item.Discount.Replace("%", ""));
+				}
+
+				Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? item.Count + " * " + item.Price : "", $"{Math.Round(item.Count * item.Price, 2):F2}");
+
+				if (discountKr != 0)
+				{
+					Console.WriteLine("{0,-16}{1,18}", $"   *Rabatt: {discountKr}kr", $"-{item.Price * item.Count - item.Price * item.Count * discountKr:F2}");
+				}
+				if (discountPc != 0)
+				{
+					Console.WriteLine("{0,-16}{1,18}", $"   *Rabatt: {discountPc}%", $"-{item.Count * item.Price * (discountPc / 100):F2}");
 				}
 			}
 		}
@@ -123,18 +168,30 @@ public class CashRegister : ICashRegister
 
 		foreach (var item in _receiptList)
 		{
-			receiptString += string.Format("{0,-13}{1,-12}{2,10}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", $"{item.Count} * {item.Price}", $"{Math.Round(item.Count * item.Price, 2):F2}\n");
-			if (item.Discount < 1 && item.Discount != 0)
+			int discountKr = 0;
+			double discountPc = 0;
+
+			if (item.Discount.EndsWith("kr"))
 			{
-				receiptString += string.Format("{0,11}{1,24}", "*Rabatt:", $"-{item.Price * item.Count - item.Price * item.Count * item.Discount:F2}\n");
+				discountKr = int.Parse(item.Discount.Replace("kr", ""));
 			}
-			if (item.Discount >= 1)
+			if (item.Discount.EndsWith('%'))
 			{
-				receiptString += string.Format("{0,11}{1,24}", "*Rabatt:", $"-{item.Count * item.Discount:F2}\n");
+				discountPc = double.Parse(item.Discount.Replace("%", ""));
+			}
+
+			receiptString += string.Format("{0,-13}{1,-12}{2,10}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? (item.Count + " * " + item.Price) : (""), $"{Math.Round(item.Count * item.Price, 2):F2}\n");
+			if (discountPc != 0.0)
+			{
+				receiptString += string.Format("{0,-16}{1,19}", $"   *Rabatt: {discountKr}kr", $"-{item.Price * item.Count - item.Price * item.Count * discountKr:F2}\n");
+			}
+			if (discountKr != 0)
+			{
+				receiptString += string.Format("{0,-16}{1,19}", $"   *Rabatt: {discountPc}%", $"-{item.Count * item.Price * (discountPc / 100):F2}\n");
 			}
 		}
 		receiptString += string.Format("==================================\n");
-		receiptString += string.Format("{0,35}", $"Total: {FetchTotalPrice():F2}\n");
+		receiptString += string.Format("{0,31} kr\n", $"Total: {FetchTotalPrice():F2}");
 		receiptString += string.Format($"&&== {FetchTotalReceipts()} ==&&");
 
 		File.AppendAllText(_filePath, receiptString);

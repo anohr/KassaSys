@@ -46,14 +46,13 @@ public class Program
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.BackgroundColor = ConsoleColor.Red;
 
-			//Console.WriteLine($"KVITTO  #{CashRegister.FetchTotalReceipts():D4}  {DateTime.Now}");
 			Console.WriteLine("KVITTO {0,7} {1,19}", $"#{CashRegister.FetchTotalReceipts():D4}", $"{DateTime.Now}");
 
 			CashRegister.PrintReceipt();
 
 			Console.WriteLine("==================================");
 
-			Console.WriteLine("{0,34}", $"Total: {CashRegister.FetchTotalPrice():F2}");
+			Console.WriteLine("{0,31} kr", $"Total: {CashRegister.FetchTotalPrice():F2}");
 
 			Console.ResetColor();
 

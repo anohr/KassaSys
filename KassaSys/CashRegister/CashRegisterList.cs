@@ -9,5 +9,5 @@ public class CashRegisterList
 	public double Price { get; set; }
 	public int Count { get; set; }
 	public ProductType Type { get; set; }
-	public double Discount { get; set; }
+	public string Discount { get; set; }
 }

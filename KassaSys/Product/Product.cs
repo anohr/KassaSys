@@ -208,7 +208,7 @@ public class ShopProduct : IShopProducts
 				{
 					return;
 				}
-				if (check && productID > 0)
+				if (check && productID > 0 && CheckIfProductExists(productID))
 				{
 					break;
 				}

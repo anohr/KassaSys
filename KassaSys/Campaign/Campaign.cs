@@ -1,4 +1,6 @@
 ﻿using KassaSys.Product;
+using System.Diagnostics;
+using System.Linq;
 
 namespace KassaSys.Campaign;
 
@@ -6,7 +8,9 @@ public class ShopCampaign : ICampaign
 {
 	private string _filePath = @".\campaign.txt";
 	private string _splitString = " | ";
-	private List<CampaignList> _campaignList = new List<CampaignList>();
+	public List<CampaignList> _campaignList = new List<CampaignList>();
+
+	ShopProduct ProductList = new ShopProduct();
 
 	public ShopCampaign()
 	{
@@ -31,12 +35,39 @@ public class ShopCampaign : ICampaign
 			campaign.ProductID = Convert.ToInt32(args[1]);
 			campaign.StartDate = Convert.ToDateTime(args[2]);
 			campaign.EndDate = Convert.ToInt32(args[3]);
-			campaign.Discount = Convert.ToDouble(args[4]);
+			campaign.Discount = args[4];
 
 			tempCampaignList.Add(campaign);
 		}
 
 		return tempCampaignList;
+	}
+
+	public bool CheckIfCampaignExists(int id)
+	{
+		return _campaignList.Any(campaign => campaign.Id == id);
+	}
+
+	public string GetBestDiscount(int productid)
+	{
+		var bestPercentDiscount = _campaignList
+			.Where(campaign => campaign.ProductID == productid && campaign.Discount.EndsWith("%") && campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now)
+			.OrderByDescending(campaign => double.Parse(campaign.Discount.Replace("%", "")))
+			.FirstOrDefault();
+
+		string percentDiscountValue = bestPercentDiscount != null ? (bestPercentDiscount.Discount) : "0";
+
+		var bestFixedDiscount = _campaignList
+			.Where(campaign => campaign.ProductID == productid && campaign.Discount.EndsWith("kr") && campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now)
+			.OrderByDescending(campaign => double.Parse(campaign.Discount.Replace("kr", "")))
+			.FirstOrDefault();
+
+		string fixedDiscountValue = bestFixedDiscount != null ? (bestFixedDiscount.Discount) : "0";
+
+		string percentDiscount = percentDiscountValue.ToString();
+		string fixedDiscount = fixedDiscountValue.ToString();
+
+		return (percentDiscountValue.Length > 0) ? percentDiscount : fixedDiscount;
 	}
 
 	public void SaveAllToFile(List<CampaignList> tempCampaignList)
@@ -75,10 +106,11 @@ public class ShopCampaign : ICampaign
 	{
 		ShopProduct ProductList = new ShopProduct();
 
-		int campaignID;
-		double discount = 0;
+		int productID;
+		string discount = "";
 		DateTime startDate;
 		int endDate;
+		string tempDiscount = "";
 
 		Console.Clear();
 		Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -89,7 +121,7 @@ public class ShopCampaign : ICampaign
 
 		foreach (var product in ProductList.GetList())
 		{
-			Console.WriteLine($"    {product.Id,-3} {product.Name,-20} {product.Price,9:F2} kr");
+			Console.WriteLine($"    {product.Id,-3} {product.Name,-20} {product.Price:F2} kr");
 			i++;
 			if (i % 2 == 0)
 			{
@@ -117,13 +149,13 @@ public class ShopCampaign : ICampaign
 		while (true)
 		{
 			Console.Write("  Välj produkt ID: ");
-			bool check = int.TryParse(Console.ReadLine(), out campaignID);
+			bool check = int.TryParse(Console.ReadLine(), out productID);
 
-			if (check && campaignID == 0)
+			if (check && productID == 0)
 			{
 				return;
 			}
-			if (check && campaignID > 0)
+			if (check && productID > 0)
 			{
 				break;
 			}
@@ -167,37 +199,39 @@ public class ShopCampaign : ICampaign
 		while (true)
 		{
 			Console.Write("  Ange hur mycket rabatt (avsluta med kr eller %): ");
-			string tempDiscount = Console.ReadLine();
+			tempDiscount = Console.ReadLine();
 
 			if (tempDiscount == "0")
 			{
 				return;
 			}
 
-			double discountKr = 0;
-			double discountPc = 0;
+			double checkMaxPrice = ProductList.FetchProductPrice(productID);
 
-			if (tempDiscount.Contains("kr"))
+			if (tempDiscount.Length > 1 && tempDiscount.Contains("kr") || tempDiscount.Contains('%'))
 			{
-				tempDiscount = tempDiscount.Replace("kr", "").TrimEnd();
-				double.TryParse(tempDiscount, out discount);
-				discountKr = discount;
-			}
-			else if (tempDiscount.Contains("%"))
-			{
-				tempDiscount = tempDiscount.Replace("%", "").TrimEnd();
-				double.TryParse(tempDiscount, out discount);
-				discountPc = discount;
-				discount = 1 - discount / 100;
-			}
-
-			if (discount > 0 && (ProductList.FetchProductPrice(campaignID) > discountKr || discountPc < 100 && discountPc > 0))
-			{
-				break;
+				if (tempDiscount.Contains("kr"))
+				{
+					tempDiscount = tempDiscount.Replace("kr", "");
+					if (double.Parse(tempDiscount) < checkMaxPrice)
+					{
+						discount = tempDiscount + "kr";
+						break;
+					}
+				}
+				if (tempDiscount.Contains("%"))
+				{
+					tempDiscount = tempDiscount.Replace("%", "");
+					if (double.Parse(tempDiscount) < 100)
+					{
+						discount = tempDiscount + "%";
+						break;
+					}
+				}
 			}
 		}
 
-		_campaignList.Add(new CampaignList { Id = _campaignList.Count > 0 ? _campaignList.Last().Id + 1 : 1, ProductID = campaignID, StartDate = startDate, EndDate = endDate, Discount = Math.Round(discount, 2) });
+		_campaignList.Add(new CampaignList { Id = _campaignList.Count > 0 ? _campaignList.Last().Id + 1 : 1, ProductID = productID, StartDate = startDate, EndDate = endDate, Discount = discount });
 
 		SaveAllToFile(_campaignList);
 	}
@@ -211,7 +245,7 @@ public class ShopCampaign : ICampaign
 			int campaignID;
 			DateTime startDate;
 			int endDate;
-			double discount = 0;
+			string discount = "0";
 
 			Console.Clear();
 			Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -222,9 +256,7 @@ public class ShopCampaign : ICampaign
 			int i = 1;
 			foreach (var campaign in _campaignList)
 			{
-				double tempDiscount = (campaign.Discount * 100 - 100) * -1;
-
-				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount >= 1 ? Math.Round(campaign.Discount, 2) + " kr" : Math.Round(tempDiscount, 2) + " %")}");
+				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount)}");
 
 				i++;
 
@@ -260,7 +292,7 @@ public class ShopCampaign : ICampaign
 				{
 					return;
 				}
-				if (check && campaignID > 0)
+				if (check && campaignID > 0 && CheckIfCampaignExists(campaignID))
 				{
 					break;
 				}
@@ -272,7 +304,7 @@ public class ShopCampaign : ICampaign
 			{
 				string format = "yyyy-MM-dd";
 
-				Console.Write($"  Ange nytt start datum för kampanjen med ({ProductList.FetchProductName(campaignID)}): ");
+				Console.Write($"  Ange nytt start datum för kampanjen med (ID: {campaignID}) : ");
 				string inputDate = Console.ReadLine();
 
 				if (inputDate == "0")
@@ -290,7 +322,7 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				Console.Write($"  Ange hur många dagar kampanjen ska gälla för ({ProductList.FetchProductName(campaignID)}): ");
+				Console.Write($"  Ange hur många dagar kampanjen ska gälla för (ID: {campaignID}) : ");
 				bool check = int.TryParse(Console.ReadLine(), out endDate);
 
 				if (check && endDate == 0)
@@ -305,8 +337,6 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				bool check = false;
-
 				Console.Write("  Ange hur mycket rabatt (avsluta med kr eller %) ");
 				string tempDiscount = Console.ReadLine();
 
@@ -315,21 +345,30 @@ public class ShopCampaign : ICampaign
 					return;
 				}
 
-				if (tempDiscount.Contains("kr"))
-				{
-					tempDiscount = tempDiscount.Replace("kr", "").TrimEnd();
-					check = double.TryParse(tempDiscount, out discount);
-				}
-				else if (tempDiscount.Contains("%"))
-				{
-					tempDiscount = tempDiscount.Replace("%", "").TrimEnd();
-					check = double.TryParse(tempDiscount, out discount);
-					discount = 1 - discount / 100;
-				}
+				int productId = _campaignList.Where(campaign => campaign.Id == campaignID).Select(campaign => campaign.ProductID).FirstOrDefault();
 
-				if (check && discount > 0 && ProductList.FetchProductPrice(campaignID)! > discount)
+				double checkMaxPrice = ProductList.FetchProductPrice(productId);
+
+				if (tempDiscount.Length > 1 && tempDiscount.Contains("kr") || tempDiscount.Contains('%'))
 				{
-					break;
+					if (tempDiscount.Contains("kr"))
+					{
+						tempDiscount = tempDiscount.Replace("kr", "");
+						if (double.Parse(tempDiscount) < checkMaxPrice)
+						{
+							discount = tempDiscount + "kr";
+							break;
+						}
+					}
+					if (tempDiscount.Contains("%"))
+					{
+						tempDiscount = tempDiscount.Replace("%", "");
+						if (double.Parse(tempDiscount) < 100)
+						{
+							discount = tempDiscount + "%";
+							break;
+						}
+					}
 				}
 			}
 
@@ -361,9 +400,7 @@ public class ShopCampaign : ICampaign
 			int i = 1;
 			foreach (var campaign in _campaignList)
 			{
-				double tempDiscount = (campaign.Discount * 100 - 100) * -1;
-
-				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount >= 1 ? Math.Round(campaign.Discount, 2) + " kr" : Math.Round(tempDiscount, 2) + " %")}");
+				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {campaign.Discount}");
 
 				i++;
 

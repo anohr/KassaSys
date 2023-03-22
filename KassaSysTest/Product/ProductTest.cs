@@ -7,7 +7,7 @@ namespace KassaSysTest.Product;
 public class ProductTest
 {
 	private readonly ShopProduct sut;
-	private List<ProductList> Products { get; set; }
+
 
 	public ProductTest()
 	{
