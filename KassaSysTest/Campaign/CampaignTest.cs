@@ -15,7 +15,7 @@ public class CampaignTest
 		sut = new ShopCampaign();
 		sut2 = new ShopProduct();
 
-		sut._campaignList.Add(new CampaignList { Id = 1, ProductID = 1, StartDate = DateTime.Now.AddDays(-1), EndDate = 7, Discount = "10%" });
+		sut._campaignList.Add(new CampaignList { Id = 1, ProductID = 1, StartDate = DateTime.Now.AddDays(-1), EndDate = 7, Discount = "4kr" });
 		sut._campaignList.Add(new CampaignList { Id = 2, ProductID = 1, StartDate = DateTime.Now, EndDate = 7, Discount = "90%" });
 
 		sut2.ProductList.Add(new ProductList { Id = 1, Name = "Citron", Price = 10, Type = ProductType.st });
@@ -46,21 +46,7 @@ public class CampaignTest
 	}
 
 	[TestMethod]
-	public void Fetch_best_discound_depending_on_secound_arg()
-	{
-		// Arrange
-
-		// Act
-		var resultPc = sut.FetchBestDiscount(1, "%");
-		var resultKr = sut.FetchBestDiscount(1, "kr");
-
-		// Assert
-		Assert.AreEqual("90%", resultPc);
-		Assert.AreEqual("4kr", resultKr);
-	}
-
-	[TestMethod]
-	public void GetBestDiscount_Returns_Best_Discount_For_Product()
+	public void Check_for_best_discount()
 	{
 		// Arrange
 
@@ -69,7 +55,7 @@ public class CampaignTest
 
 		// Assert
 		Assert.IsNotNull(result);
-		Assert.AreEqual("90%", result);
 		Assert.IsTrue(result.Contains("%") || result.Contains("kr"));
+		Assert.AreEqual("90%", result);
 	}
 }

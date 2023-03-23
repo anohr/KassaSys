@@ -1,6 +1,5 @@
 ﻿using KassaSys.Product;
-using System.Diagnostics;
-using System.Linq;
+
 
 namespace KassaSys.Campaign;
 
@@ -9,8 +8,6 @@ public class ShopCampaign : ICampaign
 	private string _filePath = @".\campaign.txt";
 	private string _splitString = " | ";
 	public List<CampaignList> _campaignList = new List<CampaignList>();
-
-	ShopProduct ProductList = new ShopProduct();
 
 	public ShopCampaign()
 	{
@@ -61,12 +58,15 @@ public class ShopCampaign : ICampaign
 
 	public string GetBestDiscount(int productid)
 	{
+		ShopProduct ProductList = new ShopProduct();
+
 		var bestPercentDiscount = FetchBestDiscount(productid, "%");
 		var bestMoneyDiscount = FetchBestDiscount(productid, "kr");
+
 		var ProduPrice = ProductList.FetchProductPrice(productid);
 
 		var bestPercent = (ProduPrice * Math.Round((1 - (double.Parse(bestPercentDiscount.Replace("%", "")) / 100)), 2));
-		var bestMoney = (ProduPrice - int.Parse(bestMoneyDiscount.Replace("kr", "")));
+		var bestMoney = (ProduPrice - double.Parse(bestMoneyDiscount.Replace("kr", "")));
 
 		return (bestMoney > bestPercent) ? bestPercentDiscount : bestMoneyDiscount;
 	}
