@@ -43,18 +43,7 @@ public class Program
 			Console.Clear();
 			Console.WriteLine("KASSA");
 
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.BackgroundColor = ConsoleColor.Red;
-
-			Console.WriteLine("KVITTO {0,7} {1,19}", $"#{CashRegister.FetchTotalReceipts():D4}", $"{DateTime.Now}");
-
 			CashRegister.PrintReceipt();
-
-			Console.WriteLine("==================================");
-
-			Console.WriteLine("{0,31} kr", $"Total: {CashRegister.FetchTotalPrice():F2}");
-
-			Console.ResetColor();
 
 			Console.WriteLine("kommando:\n<productid> <antal>\nPAY");
 			Console.Write("Kommando:");

@@ -120,16 +120,22 @@ public class CashRegister : ICashRegister
 
 	public void PrintReceipt()
 	{
+		Console.ForegroundColor = ConsoleColor.White;
+		Console.BackgroundColor = ConsoleColor.Red;
+
+		Console.WriteLine("KVITTO {0,7} {1,19}", $"#{FetchTotalReceipts():D4}", $"{DateTime.Now}");
+
 		if (_receiptList.Count > 0)
 		{
 			Console.WriteLine("==================================");
+
 			foreach (var item in _receiptList)
 			{
 				Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? item.Count + " * " + item.Price : "", $"{Math.Round(item.Count * item.Price, 2):F2}");
 
 				if (item.Discount.Contains("kr") && item.Discount != "0kr")
 				{
-					Console.WriteLine("{0,-20}{1,14}", $"   *Rabatt: {int.Parse(item.Discount.Replace("kr", ""))}kr/st", $"-{int.Parse(item.Discount.Replace("kr", "")) * item.Count:F2}");
+					Console.WriteLine("{0,-20}{1,14}", $"   *Rabatt: {double.Parse(item.Discount.Replace("kr", ""))}kr/st", $"-{double.Parse(item.Discount.Replace("kr", "")) * item.Count:F2}");
 				}
 				if (item.Discount.Contains('%') && item.Discount != "0%")
 				{
@@ -137,6 +143,12 @@ public class CashRegister : ICashRegister
 				}
 			}
 		}
+
+		Console.WriteLine("==================================");
+
+		Console.WriteLine("{0,31} kr", $"Total: {FetchTotalPrice():F2}");
+
+		Console.ResetColor();
 	}
 
 	public void SaveReceipt()
