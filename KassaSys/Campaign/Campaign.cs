@@ -56,9 +56,11 @@ public class ShopCampaign : ICampaign
 		return (bestDiscount != null) ? bestDiscount : "0" + typeOfDiscount;
 	}
 
-	public string GetBestDiscount(int productid)
+	public string GetBestDiscount(int productid, ShopProduct ProductList=null)
 	{
-		ShopProduct ProductList = new ShopProduct();
+		// Stefan fix. :)
+		if(ProductList == null)
+			ProductList = new ShopProduct();
 
 		var bestPercentDiscount = FetchBestDiscount(productid, "%");
 		var bestMoneyDiscount = FetchBestDiscount(productid, "kr");
@@ -68,7 +70,7 @@ public class ShopCampaign : ICampaign
 		var bestPercent = (ProduPrice * Math.Round((1 - (double.Parse(bestPercentDiscount.Replace("%", "")) / 100)), 2));
 		var bestMoney = (ProduPrice - double.Parse(bestMoneyDiscount.Replace("kr", "")));
 
-		return (bestMoney > bestPercent) ? bestPercentDiscount : bestMoneyDiscount;
+		return (bestMoney < bestPercent) ? bestMoneyDiscount : bestPercentDiscount;
 	}
 
 	public void SaveAllToFile(List<CampaignList> tempCampaignList)
