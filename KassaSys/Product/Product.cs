@@ -1,6 +1,8 @@
 ﻿using KassaSys.Campaign;
 using KassaSys.Enum;
+using System.Diagnostics;
 using System.Text;
+using System.Xml.Linq;
 
 namespace KassaSys.Product;
 
@@ -75,6 +77,7 @@ public class ShopProduct : IProducts
 
 	public void AddProduct()
 	{
+		string tempInput = string.Empty;
 		double price;
 		int group;
 		string name;
@@ -87,61 +90,71 @@ public class ShopProduct : IProducts
 		while (true)
 		{
 			Console.Write("   Ange produkt namn: ");
-			name = Console.ReadLine();
+			tempInput = Console.ReadLine();
 
-			if (name == "0")
+			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
-				return;
-			}
-			if (name.Length > 0)
-			{
+				if (tempInput == "0")
+				{
+					return;
+				}
+
+				name = tempInput.Trim();
+
 				break;
 			}
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("     Felaktig inmatning. Försök igen.");
+			Console.ResetColor();
 		}
 
 		while (true)
 		{
 			Console.Write("   Ange produkt pris (ex 12,34): ");
-			bool check = double.TryParse(Console.ReadLine(), out price);
+			tempInput = Console.ReadLine();
 
-			if (check && price == 0)
+			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
-				return;
+				if (tempInput == "0")
+				{
+					return;
+				}
+
+				if (double.TryParse(tempInput.Replace('.', ','), out price) && price > 0)
+				{
+					break;
+				}
 			}
-			if (check && price > 0)
-			{
-				break;
-			}
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("     Felaktig inmatning. Försök igen.");
+			Console.ResetColor();
 		}
 
 		while (true)
 		{
-			StringBuilder pg = new StringBuilder();
+			Console.Write($"   Ange prisgrupp ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+			tempInput = Console.ReadLine();
 
-			Console.Write("   Ange prisgrupp (");
-
-			foreach (var type in System.Enum.GetValues(typeof(ProductType)))
+			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
-				if (pg.Length > 1)
+				if (tempInput == "0")
 				{
-					pg.Append(", ");
+					return;
 				}
-				pg.Append($"{type}");
+
+				if (System.Enum.TryParse<ProductType>(tempInput, true, out ProductType result))
+				{
+					inputEnum = result;
+
+					break;
+				}
 			}
 
-			Console.Write(pg.ToString() + ") : ");
-
-			string val = Console.ReadLine();
-
-			if (val == "0")
-			{
-				break;
-			}
-
-			if (System.Enum.TryParse(val, true, out inputEnum))
-			{
-				break;
-			}
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("     Felaktig inmatning. Försök igen.");
+			Console.ResetColor();
 		}
 
 		productList.Add(new ProductList { Id = productList.Count > 0 ? productList.Last().Id + 1 : 1, Name = name, Price = price, Type = inputEnum });
@@ -153,7 +166,8 @@ public class ShopProduct : IProducts
 	{
 		while (true)
 		{
-			int productID;
+			string tempInput = string.Empty;
+			int productId;
 			string newName;
 			double newPrice;
 			ProductType newType = ProductType.kg;
@@ -196,83 +210,100 @@ public class ShopProduct : IProducts
 
 			while (true)
 			{
-				Console.Write("  Välj produkt ID: ");
-				bool check = int.TryParse(Console.ReadLine(), out productID);
+				Console.Write("  Välj produkt Id: ");
+				tempInput = Console.ReadLine();
 
-				if (check && productID == 0)
+				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
-					return;
+					if (tempInput == "0")
+					{
+						return;
+					}
+
+					if (int.TryParse(tempInput, out productId) && productId > 0 && CheckIfProductExists(productId))
+					{
+						break;
+					}
 				}
-				if (check && productID > 0 && CheckIfProductExists(productID))
-				{
-					break;
-				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
 			}
 
 			Console.Write("\n");
 
 			while (true)
 			{
-				Console.Write($"    Ange nytt produkt namn på ({FetchProductName(productID)}): ");
+				Console.Write($"    Ange nytt produkt namn på ({FetchProductName(productId)}): ");
 				newName = Console.ReadLine();
 
-				if (newName == "0")
+				if (!string.IsNullOrWhiteSpace(newName))
 				{
-					return;
-				}
-				if (newName.Length > 0)
-				{
-					break;
-				}
-			}
-
-			while (true)
-			{
-				Console.Write($"    Ange nytt produkt pris (tidigare: {FetchProductPrice(productID):F2}): ");
-				bool check = double.TryParse(Console.ReadLine(), out newPrice);
-
-				if (check && newPrice == 0)
-				{
-					return;
-				}
-				if (check && newPrice > 0)
-				{
-					break;
-				}
-			}
-
-			while (true)
-			{
-				Console.Write($"   Ange ny prisgrupp (tidigare: {FetchProductType(productID)}) (");
-
-				int j = 0;
-				foreach (var type in System.Enum.GetValues(typeof(ProductType)))
-				{
-					Console.Write($"{type}");
-
-					if (j == 0)
+					if (newName == "0")
 					{
-						Console.Write(", ");
-						j++;
+						return;
+					}
+
+					newName = newName.Trim();
+
+					break;
+				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
+			}
+
+			while (true)
+			{
+				Console.Write($"    Ange nytt produkt pris ({FetchProductPrice(productId):F2}): ");
+				tempInput = Console.ReadLine();
+
+				if (!string.IsNullOrWhiteSpace(tempInput))
+				{
+					if (tempInput == "0")
+					{
+						return;
+					}
+
+					if (double.TryParse(tempInput.Replace('.', ','), out newPrice) && newPrice > 0)
+					{
+						break;
 					}
 				}
 
-				Console.Write(") : ");
-
-				string val = Console.ReadLine();
-
-				if (val == "0")
-				{
-					break;
-				}
-
-				if (System.Enum.TryParse(val, true, out newType))
-				{
-					break;
-				}
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
 			}
 
-			productList.Where(product => product.Id == productID).ToList().ForEach(product =>
+			while (true)
+			{
+				Console.Write($"    Ange ny prisgrupp ({FetchProductType(productId)}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+				tempInput = Console.ReadLine();
+
+				if (!string.IsNullOrWhiteSpace(tempInput))
+				{
+					if (tempInput == "0")
+					{
+						return;
+					}
+
+					if (System.Enum.TryParse<ProductType>(tempInput, true, out ProductType result))
+					{
+						newType = result;
+
+						break;
+					}
+				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
+			}
+
+			productList.Where(product => product.Id == productId).ToList().ForEach(product =>
 			{
 				product.Name = newName;
 				product.Price = newPrice;
@@ -287,7 +318,8 @@ public class ShopProduct : IProducts
 	{
 		while (true)
 		{
-			int productID;
+			string tempInput = string.Empty;
+			int productId;
 
 			Console.Clear();
 			Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -295,13 +327,11 @@ public class ShopProduct : IProducts
 
 			Console.WriteLine("    {0,-3} {1,-15} {2,-10} {3}\n", "Id", "Namn", "Pris", "Prisgrupp");
 
-			int i = 1;
-
-			foreach (var product in productList)
+			for (int i = 0; i < productList.Count; i++)
 			{
-				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,8:F2}   {product.Type}");
+				var product = productList[i];
 
-				i++;
+				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,8:F2}   {product.Type}");
 
 				if (i % 2 == 0)
 				{
@@ -328,20 +358,28 @@ public class ShopProduct : IProducts
 
 			while (true)
 			{
-				Console.Write("  Välj produkt ID: ");
-				bool check = int.TryParse(Console.ReadLine(), out productID);
+				Console.Write("  Välj produkt Id: ");
+				tempInput = Console.ReadLine();
 
-				if (check && productID == 0)
+				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
-					return;
+					if (tempInput == "0")
+					{
+						return;
+					}
+
+					if (int.TryParse(tempInput, out productId) && productId > 0 && CheckIfProductExists(productId))
+					{
+						break;
+					}
 				}
-				if (check && productID > 0)
-				{
-					break;
-				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
 			}
 
-			productList.Where(product => product.Id == productID).ToList().ForEach(product =>
+			productList.Where(product => product.Id == productId).ToList().ForEach(product =>
 			{
 				productList.Remove(product);
 			});
@@ -350,7 +388,7 @@ public class ShopProduct : IProducts
 
 			ShopCampaign campaignList = new ShopCampaign();
 
-			campaignList.RemoveCampaign(productID);
+			campaignList.RemoveCampaign(productId);
 		}
 	}
 }
