@@ -23,18 +23,19 @@ public class ShopProduct : IProducts
 			return tempProductList;
 		}
 
-		foreach (var line in File.ReadLines(_filePath))
-		{
-			var args = line.Split(_splitString);
-			var product = new ProductList();
-
-			product.Id = Convert.ToInt32(args[0]);
-			product.Name = args[1];
-			product.Price = Convert.ToDouble(args[2]);
-			product.Type = (ProductType)System.Enum.Parse(typeof(ProductType), args[3]);
-
-			tempProductList.Add(product);
-		}
+		tempProductList = File.ReadLines(_filePath)
+			.Select(line =>
+			{
+				var args = line.Split(_splitString);
+				return new ProductList
+				{
+					Id = Convert.ToInt32(args[0]),
+					Name = args[1],
+					Price = Convert.ToDouble(args[2]),
+					Type = (ProductType)System.Enum.Parse(typeof(ProductType), args[3])
+				};
+			})
+			.ToList();
 
 		return tempProductList;
 	}
