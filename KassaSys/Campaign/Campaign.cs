@@ -1,4 +1,5 @@
 ﻿using KassaSys.Product;
+using Microsoft.VisualBasic;
 
 
 namespace KassaSys.Campaign;
@@ -50,6 +51,10 @@ public class ShopCampaign : ICampaign
 	{
 		return campaignList.Any(campaign => campaign.Id == campaignId);
 	}
+	public int FetchProductIdFromCampaign(int campaignId)
+	{
+		return campaignList.Where(campaign => campaign.Id == campaignId).Select(campaign => campaign.ProductID).FirstOrDefault();
+	}
 
 	public string FetchBestDiscountForEachType(int productId, string typeOfDiscount)
 	{
@@ -57,9 +62,9 @@ public class ShopCampaign : ICampaign
 								.Where(campaign => campaign.ProductID == productId && campaign.Discount.Contains(typeOfDiscount) && (campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now))
 								.OrderByDescending(campaign => campaign.Discount.Replace(typeOfDiscount, ""))
 								.Select(campaign => campaign.Discount)
-								.FirstOrDefault();
+								.SingleOrDefault();
 
-		return (bestDiscount != null) ? bestDiscount : "0" + typeOfDiscount;
+		return bestDiscount ?? "0" + typeOfDiscount;
 	}
 
 	public string CalculateBestDiscount(int productId, ShopProduct ProductList = null)
@@ -73,10 +78,10 @@ public class ShopCampaign : ICampaign
 
 		var produPrice = ProductList.FetchProductPrice(productId);
 
-		var bestPercent = (produPrice * Math.Round((1 - (double.Parse(bestPercentDiscount.Replace("%", "")) / 100)), 2));
-		var bestMoney = (produPrice - double.Parse(bestMoneyDiscount.Replace("kr", "")));
+		var bestPercentAfterDiscount = (produPrice * Math.Round((1 - (double.Parse(bestPercentDiscount.Replace("%", "")) / 100)), 2));
+		var bestMoneyAfterDiscount = (produPrice - double.Parse(bestMoneyDiscount.Replace("kr", "")));
 
-		return (bestMoney < bestPercent) ? bestMoneyDiscount : bestPercentDiscount;
+		return (bestMoneyAfterDiscount < bestPercentAfterDiscount) ? bestMoneyDiscount : bestPercentDiscount;
 	}
 
 	public void SaveToFile(List<CampaignList> tempCampaignList)
@@ -104,7 +109,9 @@ public class ShopCampaign : ICampaign
 	{
 		ShopProduct productList = new ShopProduct();
 
-		int productID;
+		string tempInput = string.Empty;
+		string dateFormat = "yyyy-MM-dd";
+		int productId;
 		string discount = "";
 		DateTime startDate;
 		int endDate;
@@ -114,13 +121,14 @@ public class ShopCampaign : ICampaign
 		Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
 		Console.WriteLine("  - Lägg till en ny kampanj -\n");
 
-		int i = 1;
 		Console.WriteLine("    {0,-3} {1,-20} {2,-9}\n", "Id", "Produkt namn", "Pris");
 
-		foreach (var product in productList.FetchList())
+		for (int i = 0; i < productList.FetchList().Count; i++)
 		{
+			var product = productList.FetchList()[i];
+
 			Console.WriteLine($"    {product.Id,-3} {product.Name,-20} {product.Price:F2} kr");
-			i++;
+
 			if (i % 2 == 0)
 			{
 				Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -146,90 +154,116 @@ public class ShopCampaign : ICampaign
 
 		while (true)
 		{
-			Console.Write("  Välj produkt ID: ");
-			bool check = int.TryParse(Console.ReadLine(), out productID);
+			Console.Write("  Välj produkt Id: ");
+			tempInput = Console.ReadLine().Trim();
 
-			if (check && productID == 0)
+			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
-				return;
+				if (tempInput == "0")
+				{
+					return;
+				}
+
+				if (int.TryParse(tempInput, out productId) && productId > 0 && productList.CheckIfProductExists(productId))
+				{
+					break;
+				}
 			}
-			if (check && productID > 0)
-			{
-				break;
-			}
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("      Felaktig inmatning. Försök igen.");
+			Console.ResetColor();
 		}
 
 		while (true)
 		{
-			string format = "yyyy-MM-dd";
+			Console.Write($"  Ange start datum ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
+			tempInput = Console.ReadLine().Trim();
 
-			Console.Write("\n  Ange start datum (YYYY-MM-DD): ");
-			string inputDate = Console.ReadLine();
-
-			if (inputDate == "0")
+			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
-				return;
+				if (tempInput == "0")
+				{
+					return;
+				}
+
+				if (DateTime.TryParseExact(tempInput, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out startDate) && startDate.Date >= DateTime.Now.Date)
+				{
+					break;
+				}
 			}
-
-			bool dateCheck = DateTime.TryParseExact(inputDate, format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out startDate);
-
-			if (dateCheck && startDate.Date >= DateTime.Now.Date)
+			else if (string.IsNullOrEmpty(tempInput))
 			{
+				startDate = DateTime.Now;
 				break;
 			}
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("      Felaktig inmatning. Försök igen.");
+			Console.ResetColor();
 		}
 
 		while (true)
 		{
 			Console.Write("  Ange hur många dagar kampanjen ska gälla: ");
-			bool check = int.TryParse(Console.ReadLine(), out endDate);
+			tempInput = Console.ReadLine().Trim();
 
-			if (check && endDate == 0)
+			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
-				return;
+				if (tempInput == "0")
+				{
+					return;
+				}
+
+				if (int.TryParse(tempInput, out endDate) && endDate > 0)
+				{
+					break;
+				}
 			}
-			if (check && endDate > 0)
-			{
-				break;
-			}
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("      Felaktig inmatning. Försök igen.");
+			Console.ResetColor();
 		}
 
 		while (true)
 		{
 			Console.Write("  Ange hur mycket rabatt (avsluta med kr eller %): ");
-			tempDiscount = Console.ReadLine();
+			tempInput = Console.ReadLine();
 
-			if (tempDiscount == "0")
+			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
-				return;
-			}
-
-			double checkMaxPrice = productList.FetchProductPrice(productID);
-
-			if (tempDiscount.Length > 1 && tempDiscount.Contains("kr") || tempDiscount.Contains('%'))
-			{
-				if (tempDiscount.Contains("kr"))
+				if (tempInput == "0")
 				{
-					tempDiscount = tempDiscount.Replace("kr", "");
-					if (double.Parse(tempDiscount) < checkMaxPrice)
+					return;
+				}
+
+				double productPrice = productList.FetchProductPrice(productId);
+
+				if (tempInput.EndsWith("kr") && double.TryParse(tempInput.Replace("kr", ""), out double discountMoney))
+				{
+					if (discountMoney < productPrice)
 					{
-						discount = tempDiscount + "kr";
+						discount = $"{discountMoney}kr";
 						break;
 					}
 				}
-				if (tempDiscount.Contains("%"))
+				else if (tempInput.EndsWith("%") && double.TryParse(tempInput.Replace("%", ""), out double discountPercent))
 				{
-					tempDiscount = tempDiscount.Replace("%", "");
-					if (double.Parse(tempDiscount) < 100)
+					if (discountPercent < productPrice)
 					{
-						discount = tempDiscount + "%";
+						discount = $"{discountPercent}%";
 						break;
 					}
 				}
 			}
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("      Felaktig inmatning. Försök igen.");
+			Console.ResetColor();
 		}
 
-		campaignList.Add(new CampaignList { Id = campaignList.Count > 0 ? campaignList.Last().Id + 1 : 1, ProductID = productID, StartDate = startDate, EndDate = endDate, Discount = discount });
+		campaignList.Add(new CampaignList { Id = campaignList.Count > 0 ? campaignList.Last().Id + 1 : 1, ProductID = productId, StartDate = startDate, EndDate = endDate, Discount = discount });
 
 		SaveToFile(campaignList);
 	}
@@ -238,9 +272,11 @@ public class ShopCampaign : ICampaign
 	{
 		while (true)
 		{
-			ShopProduct ProductList = new ShopProduct();
+			ShopProduct productList = new ShopProduct();
 
-			int campaignID;
+			string tempInput = string.Empty;
+			string dateFormat = "yyyy-MM-dd";
+			int campaignId;
 			DateTime startDate;
 			int endDate;
 			string discount = "0";
@@ -251,12 +287,11 @@ public class ShopCampaign : ICampaign
 
 			Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4}\n", "Id", "Produktnamn", "Start", "Slut", "Rabatt");
 
-			int i = 1;
-			foreach (var campaign in campaignList)
+			for (int i = 0; i < campaignList.Count; i++)
 			{
-				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount)}");
+				var campaign = campaignList[i];
 
-				i++;
+				Console.WriteLine($"    {campaign.Id,-3} {productList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount)}");
 
 				if (i % 2 == 0)
 				{
@@ -283,94 +318,119 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				Console.Write("  Välj kampanj ID: ");
-				bool check = int.TryParse(Console.ReadLine(), out campaignID);
+				Console.Write("  Välj produkt Id: ");
+				tempInput = Console.ReadLine().Trim();
 
-				if (check && campaignID == 0)
+				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
-					return;
+					if (tempInput == "0")
+					{
+						return;
+					}
+
+					if (int.TryParse(tempInput, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
+					{
+						break;
+					}
 				}
-				if (check && campaignID > 0 && CheckIfCampaignExists(campaignID))
-				{
-					break;
-				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
 			}
 
 			Console.Write("\n");
 
 			while (true)
 			{
-				string format = "yyyy-MM-dd";
+				Console.Write($"  Ange nytt start datum för kampanjen ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
+				tempInput = Console.ReadLine().Trim();
 
-				Console.Write($"  Ange nytt start datum för kampanjen med (ID: {campaignID}) : ");
-				string inputDate = Console.ReadLine();
-
-				if (inputDate == "0")
+				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
-					return;
+					if (tempInput == "0")
+					{
+						return;
+					}
+
+					if (DateTime.TryParseExact(tempInput, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out startDate) && startDate.Date >= DateTime.Now.Date)
+					{
+						break;
+					}
 				}
-
-				bool dateCheck = DateTime.TryParseExact(inputDate, format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out startDate);
-
-				if (dateCheck && startDate.Date >= DateTime.Now.Date)
+				else if (string.IsNullOrEmpty(tempInput))
 				{
+					startDate = DateTime.Now;
 					break;
 				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
 			}
 
 			while (true)
 			{
-				Console.Write($"  Ange hur många dagar kampanjen ska gälla för (ID: {campaignID}) : ");
-				bool check = int.TryParse(Console.ReadLine(), out endDate);
+				Console.Write($"  Ange hur många dagar kampanjen ska gälla : ");
+				tempInput = Console.ReadLine().Trim();
 
-				if (check && endDate == 0)
+				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
-					return;
+					if (tempInput == "0")
+					{
+						return;
+					}
+
+					if (int.TryParse(tempInput, out endDate) && endDate > 0)
+					{
+						break;
+					}
 				}
-				if (check && endDate > 0)
-				{
-					break;
-				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
 			}
 
 			while (true)
 			{
-				Console.Write("  Ange hur mycket rabatt (avsluta med kr eller %) ");
-				string tempDiscount = Console.ReadLine();
+				Console.Write("  Ange hur mycket rabatt (avsluta med kr eller %): ");
+				tempInput = Console.ReadLine();
 
-				if (tempDiscount == "0")
+				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
-					return;
-				}
-
-				int productId = campaignList.Where(campaign => campaign.Id == campaignID).Select(campaign => campaign.ProductID).FirstOrDefault();
-
-				double checkMaxPrice = ProductList.FetchProductPrice(productId);
-
-				if (tempDiscount.Length > 1 && tempDiscount.Contains("kr") || tempDiscount.Contains('%'))
-				{
-					if (tempDiscount.Contains("kr"))
+					if (tempInput == "0")
 					{
-						tempDiscount = tempDiscount.Replace("kr", "");
-						if (double.Parse(tempDiscount) < checkMaxPrice)
+						return;
+					}
+
+					int productId = FetchProductIdFromCampaign(campaignId);
+					double productPrice = productList.FetchProductPrice(productId);
+
+					if (tempInput.EndsWith("kr") && double.TryParse(tempInput.Replace("kr", ""), out double discountMoney))
+					{
+						if (discountMoney < productPrice)
 						{
-							discount = tempDiscount + "kr";
+							discount = $"{discountMoney}kr";
 							break;
 						}
 					}
-					if (tempDiscount.Contains("%"))
+					else if (tempInput.EndsWith("%") && double.TryParse(tempInput.Replace("%", ""), out double discountPercent))
 					{
-						tempDiscount = tempDiscount.Replace("%", "");
-						if (double.Parse(tempDiscount) < 100)
+						if (discountPercent < productPrice)
 						{
-							discount = tempDiscount + "%";
+							discount = $"{discountPercent}%";
 							break;
 						}
 					}
 				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
 			}
 
-			campaignList.Where(campaign => campaign.Id == campaignID).ToList().ForEach(campaign =>
+			campaignList.Where(campaign => campaign.Id == campaignId).ToList().ForEach(campaign =>
 			{
 				campaign.StartDate = startDate;
 				campaign.EndDate = endDate;
@@ -387,7 +447,8 @@ public class ShopCampaign : ICampaign
 		{
 			ShopProduct ProductList = new ShopProduct();
 
-			int campaignID;
+			string tempInput = string.Empty;
+			int campaignId;
 
 			Console.Clear();
 			Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -395,12 +456,11 @@ public class ShopCampaign : ICampaign
 
 			Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4}\n", "Id", "Produktnamn", "Start datum", "Slut datum", "Rabatt");
 
-			int i = 1;
-			foreach (var campaign in campaignList)
+			for (int i = 0; i < campaignList.Count; i++)
 			{
-				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {campaign.Discount}");
+				var campaign = campaignList[i];
 
-				i++;
+				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount)}");
 
 				if (i % 2 == 0)
 				{
@@ -427,20 +487,28 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				Console.Write("  Välj kampanj ID: ");
-				bool check = int.TryParse(Console.ReadLine(), out campaignID);
+				Console.Write("  Välj produkt Id: ");
+				tempInput = Console.ReadLine().Trim();
 
-				if (check && campaignID == 0)
+				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
-					return;
+					if (tempInput == "0")
+					{
+						return;
+					}
+
+					if (int.TryParse(tempInput, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
+					{
+						break;
+					}
 				}
-				if (check && campaignID > 0)
-				{
-					break;
-				}
+
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("      Felaktig inmatning. Försök igen.");
+				Console.ResetColor();
 			}
 
-			campaignList.Where(campaign => campaign.Id == campaignID).ToList().ForEach(campaign =>
+			campaignList.Where(campaign => campaign.Id == campaignId).ToList().ForEach(campaign =>
 			{
 				campaignList.Remove(campaign);
 			});
