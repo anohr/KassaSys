@@ -11,8 +11,8 @@ public class RegisterTest
 	{
 		sut = new CashRegister();
 
-		sut._receiptList.Add(new CashRegisterList { Id = 1, Name = "Banan", Count = 3, Price = 23.45, Discount = "1kr", Type = ProductType.kg });
-		sut._receiptList.Add(new CashRegisterList { Id = 2, Name = "Boll", Count = 1, Price = 425, Discount = "10%", Type = ProductType.st });
+		sut.receiptList.Add(new CashRegisterList { Id = 1, Name = "Banan", Count = 3, Price = 23.45, Discount = "1kr", Type = ProductType.kg });
+		sut.receiptList.Add(new CashRegisterList { Id = 2, Name = "Boll", Count = 1, Price = 425, Discount = "10%", Type = ProductType.st });
 	}
 
 	[TestMethod]
@@ -21,7 +21,7 @@ public class RegisterTest
 		// Arrange
 
 		// Act
-		var result = sut.FetchTotalPrice();
+		var result = sut.CalculateTotalPrice();
 
 		// Assert
 		Assert.AreEqual(449.85, result);

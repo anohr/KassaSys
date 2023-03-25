@@ -8,13 +8,12 @@ public class ProductTest
 {
 	private readonly ShopProduct sut;
 
-
 	public ProductTest()
 	{
 		sut = new ShopProduct();
 
-		sut.ProductList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
-		sut.ProductList.Add(new ProductList { Id = 2, Name = "bb", Price = 2, Type = ProductType.st });
+		sut.productList.Add(new ProductList { Id = 1, Name = "aa", Price = 1, Type = ProductType.kg });
+		sut.productList.Add(new ProductList { Id = 2, Name = "bb", Price = 2, Type = ProductType.st });
 	}
 
 	[TestMethod]
