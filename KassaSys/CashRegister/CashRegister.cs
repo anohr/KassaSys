@@ -57,10 +57,10 @@ public class CashRegister : ICashRegister
 			}
 			else if (double.TryParse(receipt.Discount.Replace("%", ""), out double discountPercent))
 			{
-				discount = receipt.Price * receipt.Count * (1 - (discountPercent / 100));
+				discount = receipt.Price * receipt.Count * (discountPercent / 100);
 			}
 
-			double price = receipt.Price * receipt.Count - discount;
+			double price = (receipt.Price * receipt.Count) - discount;
 
 			totalPrice += price;
 		}
