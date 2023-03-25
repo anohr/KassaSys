@@ -43,11 +43,13 @@ public class ShopProduct : IShopProducts
 	{
 		var stringList = new List<string>();
 
-		foreach (var product in tempProductList)
+		stringList = tempProductList.Select(product => $"{product.Id}{_splitString}{product.Name}{_splitString}{product.Price}{_splitString}{product.Type}").ToList();
+
+		/*foreach (var product in tempProductList)
 		{
 			string productString = $"{product.Id}{_splitString}{product.Name}{_splitString}{product.Price}{_splitString}{product.Type}";
 			stringList.Add(productString);
-		}
+		}*/
 
 		File.WriteAllLines(_filePath, stringList);
 	}

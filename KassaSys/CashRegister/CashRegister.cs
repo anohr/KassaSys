@@ -54,7 +54,10 @@ public class CashRegister : ICashRegister
 			else if (discountValue.EndsWith("%"))
 			{
 				double discountPercent = double.Parse(discountValue.Trim().Replace("%", ""));
-				discount = 1 - (discountPercent / 100);
+				if (discountPercent > 0)
+				{
+					discount = 1 - (discountPercent / 100);
+				}
 			}
 
 			double price = receipt.Price * receipt.Count;
@@ -131,7 +134,7 @@ public class CashRegister : ICashRegister
 
 			foreach (var item in _receiptList)
 			{
-				Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? item.Count + " * " + item.Price : "", $"{Math.Round(item.Count * item.Price, 2):F2}");
+				Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? item.Count + "*" + item.Price + "kr" : "", $"{Math.Round(item.Count * item.Price, 2):F2}");
 
 				if (item.Discount.Contains("kr") && item.Discount != "0kr")
 				{
@@ -168,7 +171,7 @@ public class CashRegister : ICashRegister
 
 		foreach (var item in _receiptList)
 		{
-			receiptString += string.Format("{0,-13}{1,-12}{2,10}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? (item.Count + " * " + item.Price) : (""), $"{Math.Round(item.Count * item.Price, 2):F2}\n");
+			receiptString += string.Format("{0,-13}{1,-12}{2,10}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? (item.Count + " * " + item.Price + "kr") : (""), $"{Math.Round(item.Count * item.Price, 2):F2}\n");
 			if (item.Discount.Contains("kr") && item.Discount != "0kr")
 			{
 				receiptString += string.Format("{0,-20}{1,15}", $"   *Rabatt: {int.Parse(item.Discount.Replace("kr", ""))}kr/st", $"-{int.Parse(item.Discount.Replace("kr", "")) * item.Count:F2}\n");
