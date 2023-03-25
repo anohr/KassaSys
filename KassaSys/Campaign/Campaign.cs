@@ -23,19 +23,20 @@ public class ShopCampaign : ICampaign
 			return tempCampaignList;
 		}
 
-		foreach (var line in File.ReadLines(_filePath))
-		{
-			var args = line.Split(_splitString);
-			var campaign = new CampaignList();
-
-			campaign.Id = Convert.ToInt32(args[0]);
-			campaign.ProductID = Convert.ToInt32(args[1]);
-			campaign.StartDate = Convert.ToDateTime(args[2]);
-			campaign.EndDate = Convert.ToInt32(args[3]);
-			campaign.Discount = args[4];
-
-			tempCampaignList.Add(campaign);
-		}
+		tempCampaignList = File.ReadLines(_filePath)
+			.Select(line =>
+			{
+				var args = line.Split(_splitString);
+				return new CampaignList
+				{
+					Id = Convert.ToInt32(args[0]),
+					ProductID = Convert.ToInt32(args[1]),
+					StartDate = Convert.ToDateTime(args[2]),
+					EndDate = Convert.ToInt32(args[3]),
+					Discount = args[4]
+				};
+			})
+			.ToList();
 
 		return tempCampaignList;
 	}
@@ -56,10 +57,10 @@ public class ShopCampaign : ICampaign
 		return (bestDiscount != null) ? bestDiscount : "0" + typeOfDiscount;
 	}
 
-	public string GetBestDiscount(int productid, ShopProduct ProductList=null)
+	public string GetBestDiscount(int productid, ShopProduct ProductList = null)
 	{
 		// Stefan fix. :)
-		if(ProductList == null)
+		if (ProductList == null)
 			ProductList = new ShopProduct();
 
 		var bestPercentDiscount = FetchBestDiscount(productid, "%");
@@ -75,13 +76,7 @@ public class ShopCampaign : ICampaign
 
 	public void SaveAllToFile(List<CampaignList> tempCampaignList)
 	{
-		var stringList = new List<string>();
-
-		foreach (var campaign in tempCampaignList)
-		{
-			string campaignString = $"{campaign.Id}{_splitString}{campaign.ProductID}{_splitString}{campaign.StartDate}{_splitString}{campaign.EndDate}{_splitString}{campaign.Discount}";
-			stringList.Add(campaignString);
-		}
+		var stringList = tempCampaignList.Select(campaign => $"{campaign.Id}{_splitString}{campaign.ProductID}{_splitString}{campaign.StartDate}{_splitString}{campaign.EndDate}{_splitString}{campaign.Discount}").ToList();
 
 		File.WriteAllLines(_filePath, stringList);
 

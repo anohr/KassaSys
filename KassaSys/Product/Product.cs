@@ -3,7 +3,7 @@ using KassaSys.Enum;
 
 namespace KassaSys.Product;
 
-public class ShopProduct : IShopProducts
+public class ShopProduct : IProducts
 {
 	private string _filePath = @".\product.txt";
 	private string _splitString = " | ";
@@ -41,15 +41,7 @@ public class ShopProduct : IShopProducts
 
 	private void SaveAllToFile(List<ProductList> tempProductList)
 	{
-		var stringList = new List<string>();
-
-		stringList = tempProductList.Select(product => $"{product.Id}{_splitString}{product.Name}{_splitString}{product.Price}{_splitString}{product.Type}").ToList();
-
-		/*foreach (var product in tempProductList)
-		{
-			string productString = $"{product.Id}{_splitString}{product.Name}{_splitString}{product.Price}{_splitString}{product.Type}";
-			stringList.Add(productString);
-		}*/
+		var stringList = tempProductList.Select(product => $"{product.Id}{_splitString}{product.Name}{_splitString}{product.Price}{_splitString}{product.Type}").ToList();
 
 		File.WriteAllLines(_filePath, stringList);
 	}

@@ -1,6 +1,6 @@
 ﻿namespace KassaSys.Product
 {
-	public interface IShopProducts
+	public interface IProducts
 	{
 		void AddProduct();
 		void UpdateProduct();
