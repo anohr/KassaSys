@@ -8,12 +8,12 @@ public class CashRegister : ICashRegister
 {
 	private string _dirPath = @".\receipts";
 	private string _filePath = @".\receipts\receipt_" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
-	public List<CashRegisterList> _receiptList = new List<CashRegisterList>();
+	public List<CashRegisterList> receiptList = new List<CashRegisterList>();
 
-	ShopProduct ProductList = new ShopProduct();
-	ShopCampaign CampaignList = new ShopCampaign();
+	ShopProduct productList = new ShopProduct();
+	ShopCampaign campaignList = new ShopCampaign();
 
-	public int FetchTotalReceipts()
+	public int FetchReceiptNumber()
 	{
 		int countReceipts = 0;
 
@@ -40,9 +40,9 @@ public class CashRegister : ICashRegister
 		return countReceipts + 1;
 	}
 
-	public double FetchTotalPrice()
+	public double CalculateTotalPrice()
 	{
-		return Math.Round(_receiptList.Sum(receipt =>
+		return Math.Round(receiptList.Sum(receipt =>
 		{
 			string discountValue = receipt.Discount.Trim();
 			double discount = 0;
@@ -61,29 +61,28 @@ public class CashRegister : ICashRegister
 			}
 
 			double price = receipt.Price * receipt.Count;
-			double discountedPrice = price;
 
 			if (discount >= 1)
 			{
-				discountedPrice = (receipt.Price - discount) * receipt.Count;
+				price = (receipt.Price - discount) * receipt.Count;
 			}
 			else if (discount > 0 && discount < 1)
 			{
-				discountedPrice = receipt.Price * discount * receipt.Count;
+				price = receipt.Price * discount * receipt.Count;
 			}
 
-			return discountedPrice;
+			return price;
 		}), 2);
 	}
 
-	public bool CheckIfProductExicsts(int id)
+	public bool CheckIfProductExicsts(int receiptId)
 	{
-		return _receiptList.Any(receipt => receipt.Id == id);
+		return receiptList.Any(receipt => receipt.Id == receiptId);
 	}
 
-	public void UpdateProductInReceipt(int id, int amount)
+	public void UpdateProductInReceipt(int receiptId, int amount)
 	{
-		_receiptList.Where(receipt => receipt.Id == id).ToList().ForEach(receipt =>
+		receiptList.Where(receipt => receipt.Id == receiptId).ToList().ForEach(receipt =>
 		{
 			int newAmount = receipt.Count += amount;
 			if (newAmount > 0)
@@ -92,32 +91,32 @@ public class CashRegister : ICashRegister
 			}
 			else
 			{
-				_receiptList.Remove(receipt);
+				receiptList.Remove(receipt);
 			}
 		});
 	}
 
-	public void AddToReceipt(int id, int amount)
+	public void AddToReceipt(int productId, int amount)
 	{
 		if (amount < 0)
 		{
 			return;
 		}
 
-		if (!ProductList.CheckIfProductExists(id))
+		if (!productList.CheckIfProductExists(productId))
 		{
 			return;
 		}
 
-		string campaign = CampaignList.GetBestDiscount(id);
+		string campaign = campaignList.CalculateBestDiscount(productId);
 
-		if (!CheckIfProductExicsts(id))
+		if (!CheckIfProductExicsts(productId))
 		{
-			_receiptList.Add(new CashRegisterList { Id = id, Name = ProductList.FetchProductName(id), Count = amount, Price = ProductList.FetchProductPrice(id), Type = ProductList.FetchProductType(id), Discount = campaign });
+			receiptList.Add(new CashRegisterList { Id = productId, Name = productList.FetchProductName(productId), Count = amount, Price = productList.FetchProductPrice(productId), Type = productList.FetchProductType(productId), Discount = campaign });
 		}
 		else
 		{
-			UpdateProductInReceipt(id, amount);
+			UpdateProductInReceipt(productId, amount);
 		}
 	}
 
@@ -126,13 +125,13 @@ public class CashRegister : ICashRegister
 		Console.ForegroundColor = ConsoleColor.White;
 		Console.BackgroundColor = ConsoleColor.Red;
 
-		Console.WriteLine("KVITTO {0,7} {1,19}", $"#{FetchTotalReceipts():D4}", $"{DateTime.Now}");
+		Console.WriteLine("KVITTO {0,7} {1,19}", $"#{FetchReceiptNumber():D4}", $"{DateTime.Now}");
 
-		if (_receiptList.Count > 0)
+		if (receiptList.Count > 0)
 		{
 			Console.WriteLine("==================================");
 
-			foreach (var item in _receiptList)
+			foreach (var item in receiptList)
 			{
 				Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? item.Count + "*" + item.Price + "kr" : "", $"{Math.Round(item.Count * item.Price, 2):F2}");
 
@@ -149,7 +148,7 @@ public class CashRegister : ICashRegister
 
 		Console.WriteLine("==================================");
 
-		Console.WriteLine("{0,31} kr", $"Total: {FetchTotalPrice():F2}");
+		Console.WriteLine("{0,31} kr", $"Total: {CalculateTotalPrice():F2}");
 
 		Console.ResetColor();
 	}
@@ -161,15 +160,15 @@ public class CashRegister : ICashRegister
 			File.Create(_filePath).Dispose();
 		}
 
-		if (_receiptList.Count == 0)
+		if (receiptList.Count == 0)
 		{
 			return;
 		}
 
-		string receiptString = string.Format("\nKVITTO {0,7} {1,19}\n", $"#{FetchTotalReceipts():D4}", $"{DateTime.Now}");
+		string receiptString = string.Format("\nKVITTO {0,7} {1,19}\n", $"#{FetchReceiptNumber():D4}", $"{DateTime.Now}");
 		receiptString += string.Format("==================================\n");
 
-		foreach (var item in _receiptList)
+		foreach (var item in receiptList)
 		{
 			receiptString += string.Format("{0,-13}{1,-12}{2,10}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? (item.Count + " * " + item.Price + "kr") : (""), $"{Math.Round(item.Count * item.Price, 2):F2}\n");
 			if (item.Discount.Contains("kr") && item.Discount != "0kr")
@@ -182,8 +181,8 @@ public class CashRegister : ICashRegister
 			}
 		}
 		receiptString += string.Format("==================================\n");
-		receiptString += string.Format("{0,31} kr\n", $"Total: {FetchTotalPrice():F2}");
-		receiptString += string.Format($"&&== {FetchTotalReceipts()} ==&&");
+		receiptString += string.Format("{0,31} kr\n", $"Total: {CalculateTotalPrice():F2}");
+		receiptString += string.Format($"&&== {FetchReceiptNumber()} ==&&");
 
 		File.AppendAllText(_filePath, receiptString);
 	}

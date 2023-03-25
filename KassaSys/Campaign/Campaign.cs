@@ -7,11 +7,11 @@ public class ShopCampaign : ICampaign
 {
 	private string _filePath = @".\campaign.txt";
 	private string _splitString = " | ";
-	public List<CampaignList> _campaignList = new List<CampaignList>();
+	public List<CampaignList> campaignList = new List<CampaignList>();
 
 	public ShopCampaign()
 	{
-		_campaignList = FetchCampaignFromFile();
+		campaignList = FetchCampaignFromFile();
 	}
 
 	public List<CampaignList> FetchCampaignFromFile()
@@ -41,15 +41,20 @@ public class ShopCampaign : ICampaign
 		return tempCampaignList;
 	}
 
-	public bool CheckIfCampaignExists(int id)
+	public List<CampaignList> FetchCampaignList()
 	{
-		return _campaignList.Any(campaign => campaign.Id == id);
+		return FetchCampaignFromFile();
 	}
 
-	public string FetchBestDiscount(int productid, string typeOfDiscount)
+	public bool CheckIfCampaignExists(int campaignId)
 	{
-		var bestDiscount = _campaignList
-								.Where(campaign => campaign.ProductID == productid && campaign.Discount.Contains(typeOfDiscount) && (campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now))
+		return campaignList.Any(campaign => campaign.Id == campaignId);
+	}
+
+	public string FetchBestDiscountForEachType(int productId, string typeOfDiscount)
+	{
+		var bestDiscount = campaignList
+								.Where(campaign => campaign.ProductID == productId && campaign.Discount.Contains(typeOfDiscount) && (campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now))
 								.OrderByDescending(campaign => campaign.Discount.Replace(typeOfDiscount, ""))
 								.Select(campaign => campaign.Discount)
 								.FirstOrDefault();
@@ -57,52 +62,47 @@ public class ShopCampaign : ICampaign
 		return (bestDiscount != null) ? bestDiscount : "0" + typeOfDiscount;
 	}
 
-	public string GetBestDiscount(int productid, ShopProduct ProductList = null)
+	public string CalculateBestDiscount(int productId, ShopProduct ProductList = null)
 	{
 		// Stefan fix. :)
 		if (ProductList == null)
 			ProductList = new ShopProduct();
 
-		var bestPercentDiscount = FetchBestDiscount(productid, "%");
-		var bestMoneyDiscount = FetchBestDiscount(productid, "kr");
+		var bestPercentDiscount = FetchBestDiscountForEachType(productId, "%");
+		var bestMoneyDiscount = FetchBestDiscountForEachType(productId, "kr");
 
-		var ProduPrice = ProductList.FetchProductPrice(productid);
+		var produPrice = ProductList.FetchProductPrice(productId);
 
-		var bestPercent = (ProduPrice * Math.Round((1 - (double.Parse(bestPercentDiscount.Replace("%", "")) / 100)), 2));
-		var bestMoney = (ProduPrice - double.Parse(bestMoneyDiscount.Replace("kr", "")));
+		var bestPercent = (produPrice * Math.Round((1 - (double.Parse(bestPercentDiscount.Replace("%", "")) / 100)), 2));
+		var bestMoney = (produPrice - double.Parse(bestMoneyDiscount.Replace("kr", "")));
 
 		return (bestMoney < bestPercent) ? bestMoneyDiscount : bestPercentDiscount;
 	}
 
-	public void SaveAllToFile(List<CampaignList> tempCampaignList)
+	public void SaveToFile(List<CampaignList> tempCampaignList)
 	{
 		var stringList = tempCampaignList.Select(campaign => $"{campaign.Id}{_splitString}{campaign.ProductID}{_splitString}{campaign.StartDate}{_splitString}{campaign.EndDate}{_splitString}{campaign.Discount}").ToList();
 
 		File.WriteAllLines(_filePath, stringList);
 
-		_campaignList = FetchCampaignFromFile();
+		campaignList = FetchCampaignFromFile();
 	}
 
-	public void RemoveCampaignId(int productId)
+	public void RemoveCampaign(int productId)
 	{
-		_campaignList.Where(campaign => campaign.ProductID == productId).ToList().ForEach(campaign =>
+		campaignList.Where(campaign => campaign.ProductID == productId).ToList().ForEach(campaign =>
 		{
-			_campaignList.Remove(campaign);
+			campaignList.Remove(campaign);
 		});
 
-		SaveAllToFile(_campaignList);
+		SaveToFile(campaignList);
 
-		_campaignList = FetchCampaignFromFile();
-	}
-
-	public List<CampaignList> GetList()
-	{
-		return FetchCampaignFromFile();
+		campaignList = FetchCampaignFromFile();
 	}
 
 	public void AddCampaign()
 	{
-		ShopProduct ProductList = new ShopProduct();
+		ShopProduct productList = new ShopProduct();
 
 		int productID;
 		string discount = "";
@@ -117,7 +117,7 @@ public class ShopCampaign : ICampaign
 		int i = 1;
 		Console.WriteLine("    {0,-3} {1,-20} {2,-9}\n", "Id", "Produkt namn", "Pris");
 
-		foreach (var product in ProductList.GetList())
+		foreach (var product in productList.FetchList())
 		{
 			Console.WriteLine($"    {product.Id,-3} {product.Name,-20} {product.Price:F2} kr");
 			i++;
@@ -133,7 +133,7 @@ public class ShopCampaign : ICampaign
 
 		Console.ResetColor();
 
-		if (ProductList.GetList().Count == 0)
+		if (productList.FetchList().Count == 0)
 		{
 			Console.WriteLine("     Inga produkter att lägga kampanj på...\n");
 			Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
@@ -204,7 +204,7 @@ public class ShopCampaign : ICampaign
 				return;
 			}
 
-			double checkMaxPrice = ProductList.FetchProductPrice(productID);
+			double checkMaxPrice = productList.FetchProductPrice(productID);
 
 			if (tempDiscount.Length > 1 && tempDiscount.Contains("kr") || tempDiscount.Contains('%'))
 			{
@@ -229,9 +229,9 @@ public class ShopCampaign : ICampaign
 			}
 		}
 
-		_campaignList.Add(new CampaignList { Id = _campaignList.Count > 0 ? _campaignList.Last().Id + 1 : 1, ProductID = productID, StartDate = startDate, EndDate = endDate, Discount = discount });
+		campaignList.Add(new CampaignList { Id = campaignList.Count > 0 ? campaignList.Last().Id + 1 : 1, ProductID = productID, StartDate = startDate, EndDate = endDate, Discount = discount });
 
-		SaveAllToFile(_campaignList);
+		SaveToFile(campaignList);
 	}
 
 	public void UpdateCampaign()
@@ -252,7 +252,7 @@ public class ShopCampaign : ICampaign
 			Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4}\n", "Id", "Produktnamn", "Start", "Slut", "Rabatt");
 
 			int i = 1;
-			foreach (var campaign in _campaignList)
+			foreach (var campaign in campaignList)
 			{
 				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount)}");
 
@@ -270,7 +270,7 @@ public class ShopCampaign : ICampaign
 
 			Console.ResetColor();
 
-			if (_campaignList.Count == 0)
+			if (campaignList.Count == 0)
 			{
 				Console.WriteLine("     Inga kampanjer att uppdatera...\n");
 				Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
@@ -343,7 +343,7 @@ public class ShopCampaign : ICampaign
 					return;
 				}
 
-				int productId = _campaignList.Where(campaign => campaign.Id == campaignID).Select(campaign => campaign.ProductID).FirstOrDefault();
+				int productId = campaignList.Where(campaign => campaign.Id == campaignID).Select(campaign => campaign.ProductID).FirstOrDefault();
 
 				double checkMaxPrice = ProductList.FetchProductPrice(productId);
 
@@ -370,14 +370,14 @@ public class ShopCampaign : ICampaign
 				}
 			}
 
-			_campaignList.Where(campaign => campaign.Id == campaignID).ToList().ForEach(campaign =>
+			campaignList.Where(campaign => campaign.Id == campaignID).ToList().ForEach(campaign =>
 			{
 				campaign.StartDate = startDate;
 				campaign.EndDate = endDate;
 				campaign.Discount = discount;
 			});
 
-			SaveAllToFile(_campaignList);
+			SaveToFile(campaignList);
 		}
 	}
 
@@ -396,7 +396,7 @@ public class ShopCampaign : ICampaign
 			Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4}\n", "Id", "Produktnamn", "Start datum", "Slut datum", "Rabatt");
 
 			int i = 1;
-			foreach (var campaign in _campaignList)
+			foreach (var campaign in campaignList)
 			{
 				Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {campaign.Discount}");
 
@@ -414,7 +414,7 @@ public class ShopCampaign : ICampaign
 
 			Console.ResetColor();
 
-			if (_campaignList.Count == 0)
+			if (campaignList.Count == 0)
 			{
 				Console.WriteLine("     Inga kampanjer att ta bort...\n");
 				Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
@@ -440,12 +440,12 @@ public class ShopCampaign : ICampaign
 				}
 			}
 
-			_campaignList.Where(campaign => campaign.Id == campaignID).ToList().ForEach(campaign =>
+			campaignList.Where(campaign => campaign.Id == campaignID).ToList().ForEach(campaign =>
 			{
-				_campaignList.Remove(campaign);
+				campaignList.Remove(campaign);
 			});
 
-			SaveAllToFile(_campaignList);
+			SaveToFile(campaignList);
 		}
 	}
 }

@@ -8,11 +8,11 @@ public class ShopProduct : IProducts
 {
 	private string _filePath = @".\product.txt";
 	private string _splitString = " | ";
-	public List<ProductList> ProductList = new List<ProductList>();
+	public List<ProductList> productList = new List<ProductList>();
 
 	public ShopProduct()
 	{
-		ProductList = FetchProductFromFile();
+		productList = FetchProductFromFile();
 	}
 
 	public List<ProductList> FetchProductFromFile()
@@ -41,36 +41,36 @@ public class ShopProduct : IProducts
 		return tempProductList;
 	}
 
-	private void SaveAllToFile(List<ProductList> tempProductList)
+	private void SaveToFile(List<ProductList> tempProductList)
 	{
 		var stringList = tempProductList.Select(product => $"{product.Id}{_splitString}{product.Name}{_splitString}{product.Price}{_splitString}{product.Type}").ToList();
 
 		File.WriteAllLines(_filePath, stringList);
 	}
 
-	public List<ProductList> GetList()
+	public List<ProductList> FetchList()
 	{
 		return FetchProductFromFile();
 	}
 
-	public string FetchProductName(int id)
+	public string FetchProductName(int productId)
 	{
-		return ProductList.Where(product => product.Id == id).Select(product => product.Name).FirstOrDefault();
+		return productList.Where(product => product.Id == productId).Select(product => product.Name).FirstOrDefault();
 	}
 
-	public double FetchProductPrice(int id)
+	public double FetchProductPrice(int productId)
 	{
-		return ProductList.Where(product => product.Id == id).Select(product => product.Price).FirstOrDefault();
+		return productList.Where(product => product.Id == productId).Select(product => product.Price).FirstOrDefault();
 	}
 
-	public bool CheckIfProductExists(int id)
+	public bool CheckIfProductExists(int productId)
 	{
-		return ProductList.Any(product => product.Id == id);
+		return productList.Any(product => product.Id == productId);
 	}
 
-	public ProductType FetchProductType(int id)
+	public ProductType FetchProductType(int productId)
 	{
-		return ProductList.Where(product => product.Id == id).Select(product => product.Type).FirstOrDefault();
+		return productList.Where(product => product.Id == productId).Select(product => product.Type).FirstOrDefault();
 	}
 
 	public void AddProduct()
@@ -144,9 +144,9 @@ public class ShopProduct : IProducts
 			}
 		}
 
-		ProductList.Add(new ProductList { Id = ProductList.Count > 0 ? ProductList.Last().Id + 1 : 1, Name = name, Price = price, Type = inputEnum });
+		productList.Add(new ProductList { Id = productList.Count > 0 ? productList.Last().Id + 1 : 1, Name = name, Price = price, Type = inputEnum });
 
-		SaveAllToFile(ProductList);
+		SaveToFile(productList);
 	}
 
 	public void UpdateProduct()
@@ -165,7 +165,7 @@ public class ShopProduct : IProducts
 			Console.WriteLine("    {0,-3} {1,-15} {2,-9}\n", "Id", "Namn", "Pris");
 
 			int i = 1;
-			foreach (var product in ProductList)
+			foreach (var product in productList)
 			{
 				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,9:F2} per {product.Type}");
 
@@ -183,7 +183,7 @@ public class ShopProduct : IProducts
 
 			Console.ResetColor();
 
-			if (ProductList.Count == 0)
+			if (productList.Count == 0)
 			{
 				Console.WriteLine("     Inga produkter att uppdatera...\n");
 				Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
@@ -272,14 +272,14 @@ public class ShopProduct : IProducts
 				}
 			}
 
-			ProductList.Where(product => product.Id == productID).ToList().ForEach(product =>
+			productList.Where(product => product.Id == productID).ToList().ForEach(product =>
 			{
 				product.Name = newName;
 				product.Price = newPrice;
 				product.Type = newType;
 			});
 
-			SaveAllToFile(ProductList);
+			SaveToFile(productList);
 		}
 	}
 
@@ -297,7 +297,7 @@ public class ShopProduct : IProducts
 
 			int i = 1;
 
-			foreach (var product in ProductList)
+			foreach (var product in productList)
 			{
 				Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,8:F2}   {product.Type}");
 
@@ -315,7 +315,7 @@ public class ShopProduct : IProducts
 
 			Console.ResetColor();
 
-			if (ProductList.Count == 0)
+			if (productList.Count == 0)
 			{
 				Console.WriteLine("     Inga produkter att ta bort...\n");
 				Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
@@ -341,16 +341,16 @@ public class ShopProduct : IProducts
 				}
 			}
 
-			ProductList.Where(product => product.Id == productID).ToList().ForEach(product =>
+			productList.Where(product => product.Id == productID).ToList().ForEach(product =>
 			{
-				ProductList.Remove(product);
+				productList.Remove(product);
 			});
 
-			SaveAllToFile(ProductList);
+			SaveToFile(productList);
 
 			ShopCampaign campaignList = new ShopCampaign();
 
-			campaignList.RemoveCampaignId(productID);
+			campaignList.RemoveCampaign(productID);
 		}
 	}
 }
