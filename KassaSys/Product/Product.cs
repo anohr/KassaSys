@@ -1,5 +1,6 @@
 ﻿using KassaSys.Campaign;
 using KassaSys.Enum;
+using System.Text;
 
 namespace KassaSys.Product;
 
@@ -115,21 +116,20 @@ public class ShopProduct : IProducts
 
 		while (true)
 		{
+			StringBuilder pg = new StringBuilder();
+
 			Console.Write("   Ange prisgrupp (");
 
-			int i = 0;
 			foreach (var type in System.Enum.GetValues(typeof(ProductType)))
 			{
-				Console.Write($"{type}");
-
-				if (i == 0)
+				if (pg.Length > 1)
 				{
-					Console.Write(", ");
-					i++;
+					pg.Append(", ");
 				}
+				pg.Append($"{type}");
 			}
 
-			Console.Write(") : ");
+			Console.Write(pg.ToString() + ") : ");
 
 			string val = Console.ReadLine();
 
