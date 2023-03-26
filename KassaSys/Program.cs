@@ -116,6 +116,12 @@ public class Program
 		}
 	}
 
+	public static string AskForInput(string str)
+	{
+		Console.Write(str);
+		return Console.ReadLine().Trim();
+	}
+
 	public static void ErrorPrint(string str)
 	{
 		Console.ForegroundColor = ConsoleColor.Red;

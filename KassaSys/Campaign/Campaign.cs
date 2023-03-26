@@ -154,8 +154,7 @@ public class ShopCampaign : ICampaign
 
 		while (true)
 		{
-			Console.Write("  Välj produkt Id: ");
-			tempInput = Console.ReadLine().Trim();
+			tempInput = Program.AskForInput("  Välj produkt Id: ");
 
 			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
@@ -175,8 +174,7 @@ public class ShopCampaign : ICampaign
 
 		while (true)
 		{
-			Console.Write($"  Ange start datum ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
-			tempInput = Console.ReadLine().Trim();
+			tempInput = Program.AskForInput($"  Ange start datum ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
 
 			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
@@ -201,8 +199,7 @@ public class ShopCampaign : ICampaign
 
 		while (true)
 		{
-			Console.Write("  Ange hur många dagar kampanjen ska gälla: ");
-			tempInput = Console.ReadLine().Trim();
+			tempInput = Program.AskForInput("  Ange hur många dagar kampanjen ska gälla: ");
 
 			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
@@ -222,8 +219,7 @@ public class ShopCampaign : ICampaign
 
 		while (true)
 		{
-			Console.Write("  Ange hur mycket rabatt (avsluta med kr eller %): ");
-			tempInput = Console.ReadLine();
+			tempInput = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
 
 			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
@@ -310,8 +306,7 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				Console.Write("  Välj produkt Id: ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput("  Välj produkt Id: ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
@@ -333,8 +328,7 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				Console.Write($"  Ange nytt start datum för kampanjen ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput($"  Ange nytt start datum för kampanjen ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
@@ -359,8 +353,7 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				Console.Write($"  Ange hur många dagar kampanjen ska gälla : ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput($"  Ange hur många dagar kampanjen ska gälla : ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
@@ -380,8 +373,7 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				Console.Write("  Ange hur mycket rabatt (avsluta med kr eller %): ");
-				tempInput = Console.ReadLine();
+				tempInput = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
@@ -471,8 +463,7 @@ public class ShopCampaign : ICampaign
 
 			while (true)
 			{
-				Console.Write("  Välj produkt Id: ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput("  Välj produkt Id: ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{

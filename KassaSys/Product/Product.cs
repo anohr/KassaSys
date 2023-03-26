@@ -106,8 +106,7 @@ public class ShopProduct : IProducts
 
 		while (true)
 		{
-			Console.Write("   Ange produkt pris (ex 12,34): ");
-			tempInput = Console.ReadLine().Trim();
+			tempInput = Program.AskForInput("   Ange produkt pris (ex 12,34): ");
 
 			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
@@ -127,8 +126,7 @@ public class ShopProduct : IProducts
 
 		while (true)
 		{
-			Console.Write($"   Ange prisgrupp ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
-			tempInput = Console.ReadLine().Trim();
+			tempInput = Program.AskForInput($"   Ange prisgrupp ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
 
 			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
@@ -200,8 +198,7 @@ public class ShopProduct : IProducts
 
 			while (true)
 			{
-				Console.Write("  Välj produkt Id: ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput("  Välj produkt Id: ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
@@ -225,8 +222,7 @@ public class ShopProduct : IProducts
 			{
 				var productName = FetchProductName(productId);
 
-				Console.Write($"    Ange nytt produkt namn på ({productName}): ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput($"    Ange nytt produkt namn på ({productName}): ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
@@ -252,8 +248,7 @@ public class ShopProduct : IProducts
 			{
 				var productPrice = FetchProductPrice(productId);
 
-				Console.Write($"    Ange nytt produkt pris ({productPrice:F2}): ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput($"    Ange nytt produkt pris ({productPrice:F2}): ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
@@ -280,8 +275,7 @@ public class ShopProduct : IProducts
 			{
 				var productType = FetchProductType(productId);
 
-				Console.Write($"    Ange ny prisgrupp ({productType}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput($"    Ange ny prisgrupp ({productType}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
@@ -292,7 +286,7 @@ public class ShopProduct : IProducts
 
 					if (System.Enum.TryParse<ProductType>(tempInput, true, out ProductType type))
 					{
-						newType = productType;
+						newType = type;
 
 						break;
 					}
@@ -361,8 +355,7 @@ public class ShopProduct : IProducts
 
 			while (true)
 			{
-				Console.Write("  Välj produkt Id: ");
-				tempInput = Console.ReadLine().Trim();
+				tempInput = Program.AskForInput("  Välj produkt Id: ");
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
