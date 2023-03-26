@@ -1,8 +1,5 @@
 ﻿using KassaSys.Campaign;
 using KassaSys.Enum;
-using System.Diagnostics;
-using System.Text;
-using System.Xml.Linq;
 
 namespace KassaSys.Product;
 
@@ -104,9 +101,7 @@ public class ShopProduct : IProducts
 				break;
 			}
 
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("     Felaktig inmatning. Försök igen.");
-			Console.ResetColor();
+			Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 		}
 
 		while (true)
@@ -127,9 +122,7 @@ public class ShopProduct : IProducts
 				}
 			}
 
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("     Felaktig inmatning. Försök igen.");
-			Console.ResetColor();
+			Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 		}
 
 		while (true)
@@ -152,9 +145,7 @@ public class ShopProduct : IProducts
 				}
 			}
 
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("     Felaktig inmatning. Försök igen.");
-			Console.ResetColor();
+			Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 		}
 
 		productList.Add(new ProductList { Id = productList.Count > 0 ? productList.Last().Id + 1 : 1, Name = name, Price = price, Type = inputEnum });
@@ -225,38 +216,43 @@ public class ShopProduct : IProducts
 					}
 				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			Console.Write("\n");
 
 			while (true)
 			{
-				Console.Write($"    Ange nytt produkt namn på ({FetchProductName(productId)}): ");
-				newName = Console.ReadLine().Trim();
+				var productName = FetchProductName(productId);
 
-				if (!string.IsNullOrWhiteSpace(newName))
+				Console.Write($"    Ange nytt produkt namn på ({productName}): ");
+				tempInput = Console.ReadLine().Trim();
+
+				if (!string.IsNullOrWhiteSpace(tempInput))
 				{
-					if (newName == "0")
+					if (tempInput == "0")
 					{
 						return;
 					}
 
-					newName = newName.Trim();
+					newName = tempInput.Trim();
 
 					break;
 				}
+				else if (string.IsNullOrEmpty(tempInput))
+				{
+					newName = productName;
+					break;
+				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			while (true)
 			{
-				Console.Write($"    Ange nytt produkt pris ({FetchProductPrice(productId):F2}): ");
+				var productPrice = FetchProductPrice(productId);
+
+				Console.Write($"    Ange nytt produkt pris ({productPrice:F2}): ");
 				tempInput = Console.ReadLine().Trim();
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
@@ -271,15 +267,20 @@ public class ShopProduct : IProducts
 						break;
 					}
 				}
+				else if (string.IsNullOrEmpty(tempInput))
+				{
+					newPrice = productPrice;
+					break;
+				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			while (true)
 			{
-				Console.Write($"    Ange ny prisgrupp ({FetchProductType(productId)}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+				var productType = FetchProductType(productId);
+
+				Console.Write($"    Ange ny prisgrupp ({productType}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
 				tempInput = Console.ReadLine().Trim();
 
 				if (!string.IsNullOrWhiteSpace(tempInput))
@@ -289,17 +290,20 @@ public class ShopProduct : IProducts
 						return;
 					}
 
-					if (System.Enum.TryParse<ProductType>(tempInput, true, out ProductType result))
+					if (System.Enum.TryParse<ProductType>(tempInput, true, out ProductType type))
 					{
-						newType = result;
+						newType = productType;
 
 						break;
 					}
 				}
+				else if (string.IsNullOrEmpty(tempInput))
+				{
+					newType = productType;
+					break;
+				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			productList.Where(product => product.Id == productId).ToList().ForEach(product =>
@@ -373,9 +377,7 @@ public class ShopProduct : IProducts
 					}
 				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			productList.Where(product => product.Id == productId).ToList().ForEach(product =>

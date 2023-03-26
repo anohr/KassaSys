@@ -170,9 +170,7 @@ public class ShopCampaign : ICampaign
 				}
 			}
 
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("      Felaktig inmatning. Försök igen.");
-			Console.ResetColor();
+			Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 		}
 
 		while (true)
@@ -198,9 +196,7 @@ public class ShopCampaign : ICampaign
 				break;
 			}
 
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("      Felaktig inmatning. Försök igen.");
-			Console.ResetColor();
+			Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 		}
 
 		while (true)
@@ -221,9 +217,7 @@ public class ShopCampaign : ICampaign
 				}
 			}
 
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("      Felaktig inmatning. Försök igen.");
-			Console.ResetColor();
+			Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 		}
 
 		while (true)
@@ -258,9 +252,7 @@ public class ShopCampaign : ICampaign
 				}
 			}
 
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("      Felaktig inmatning. Försök igen.");
-			Console.ResetColor();
+			Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 		}
 
 		campaignList.Add(new CampaignList { Id = campaignList.Count > 0 ? campaignList.Last().Id + 1 : 1, ProductID = productId, StartDate = startDate, EndDate = endDate, Discount = discount });
@@ -334,9 +326,7 @@ public class ShopCampaign : ICampaign
 					}
 				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			Console.Write("\n");
@@ -364,9 +354,7 @@ public class ShopCampaign : ICampaign
 					break;
 				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			while (true)
@@ -387,9 +375,7 @@ public class ShopCampaign : ICampaign
 					}
 				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			while (true)
@@ -425,9 +411,7 @@ public class ShopCampaign : ICampaign
 					}
 				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			campaignList.Where(campaign => campaign.Id == campaignId).ToList().ForEach(campaign =>
@@ -503,9 +487,7 @@ public class ShopCampaign : ICampaign
 					}
 				}
 
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("      Felaktig inmatning. Försök igen.");
-				Console.ResetColor();
+				Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 			}
 
 			campaignList.Where(campaign => campaign.Id == campaignId).ToList().ForEach(campaign =>

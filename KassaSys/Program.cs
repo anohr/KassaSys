@@ -34,7 +34,7 @@ public class Program
 		}
 	}
 
-	static void Register()
+	public static void Register()
 	{
 		CashRegister CashRegister = new CashRegister();
 
@@ -114,5 +114,12 @@ public class Program
 				}
 			}
 		}
+	}
+
+	public static void ErrorPrint(string str)
+	{
+		Console.ForegroundColor = ConsoleColor.Red;
+		Console.WriteLine(str);
+		Console.ResetColor();
 	}
 }
