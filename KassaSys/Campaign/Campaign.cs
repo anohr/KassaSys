@@ -8,6 +8,7 @@ public class ShopCampaign : ICampaign
 {
 	private string _filePath = @".\campaign.txt";
 	private string _splitString = " | ";
+
 	public List<CampaignList> campaignList = new List<CampaignList>();
 
 	public ShopCampaign()
@@ -115,7 +116,6 @@ public class ShopCampaign : ICampaign
 		string discount = "";
 		DateTime startDate;
 		int endDate;
-		string tempDiscount = "";
 
 		Console.Clear();
 		Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -251,7 +251,14 @@ public class ShopCampaign : ICampaign
 			Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
 		}
 
-		campaignList.Add(new CampaignList { Id = campaignList.Count > 0 ? campaignList.Last().Id + 1 : 1, ProductID = productId, StartDate = startDate, EndDate = endDate, Discount = discount });
+		campaignList.Add(new CampaignList
+		{
+			Id = campaignList.Count > 0 ? campaignList.Last().Id + 1 : 1,
+			ProductID = productId,
+			StartDate = startDate,
+			EndDate = endDate,
+			Discount = discount
+		});
 
 		SaveToFile(campaignList);
 	}

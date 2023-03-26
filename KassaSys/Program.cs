@@ -119,6 +119,7 @@ public class Program
 	public static string AskForInput(string str)
 	{
 		Console.Write(str);
+
 		return Console.ReadLine().Trim();
 	}
 

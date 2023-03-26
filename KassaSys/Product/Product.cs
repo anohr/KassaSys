@@ -7,6 +7,7 @@ public class ShopProduct : IProducts
 {
 	private string _filePath = @".\product.txt";
 	private string _splitString = " | ";
+
 	public List<ProductList> productList = new List<ProductList>();
 
 	public ShopProduct()
@@ -75,9 +76,8 @@ public class ShopProduct : IProducts
 	public void AddProduct()
 	{
 		string tempInput = string.Empty;
-		double price;
-		int group;
 		string name;
+		double price;
 		ProductType inputEnum = ProductType.kg;
 
 		Console.Clear();
@@ -86,8 +86,7 @@ public class ShopProduct : IProducts
 
 		while (true)
 		{
-			Console.Write("   Ange produkt namn: ");
-			tempInput = Console.ReadLine().Trim();
+			tempInput = Program.AskForInput("   Ange produkt namn: ");
 
 			if (!string.IsNullOrWhiteSpace(tempInput))
 			{
@@ -96,7 +95,7 @@ public class ShopProduct : IProducts
 					return;
 				}
 
-				name = tempInput.Trim();
+				name = tempInput;
 
 				break;
 			}
