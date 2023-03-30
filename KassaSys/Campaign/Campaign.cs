@@ -117,10 +117,10 @@ public class ShopCampaign : ICampaign
         int campaignEndDate;
         string campaignDiscount;
 
-        string tempProductId;
-        string tempCampaignStartDate;
-        string tempCampaignEndDays;
-        string tempCampaignDiscount;
+        string inputProductId;
+        string inputCampaignStartDate;
+        string inputCampaignEndDays;
+        string inputCampaignDiscount;
 
         Console.Clear();
         Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -157,16 +157,16 @@ public class ShopCampaign : ICampaign
 
         while (true)
         {
-            tempProductId = Program.AskForInput("  Välj produkt Id: ");
+            inputProductId = Program.AskForInput("  Välj produkt Id: ");
 
-            if (!string.IsNullOrWhiteSpace(tempProductId))
+            if (!string.IsNullOrWhiteSpace(inputProductId))
             {
-                if (tempProductId == "0")
+                if (inputProductId == "0")
                 {
                     return;
                 }
 
-                if (int.TryParse(tempProductId, out productId) && productId > 0 && productList.CheckIfProductExists(productId))
+                if (int.TryParse(inputProductId, out productId) && productId > 0 && productList.CheckIfProductExists(productId))
                 {
                     break;
                 }
@@ -177,21 +177,21 @@ public class ShopCampaign : ICampaign
 
         while (true)
         {
-            tempCampaignStartDate = Program.AskForInput($"  Ange start datum ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
+            inputCampaignStartDate = Program.AskForInput($"  Ange start datum ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
 
-            if (!string.IsNullOrWhiteSpace(tempCampaignStartDate))
+            if (!string.IsNullOrWhiteSpace(inputCampaignStartDate))
             {
-                if (tempCampaignStartDate == "0")
+                if (inputCampaignStartDate == "0")
                 {
                     return;
                 }
 
-                if (DateTime.TryParseExact(tempCampaignStartDate, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out campaignStartDate) && campaignStartDate.Date >= DateTime.Now.Date)
+                if (DateTime.TryParseExact(inputCampaignStartDate, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out campaignStartDate) && campaignStartDate.Date >= DateTime.Now.Date)
                 {
                     break;
                 }
             }
-            else if (string.IsNullOrEmpty(tempCampaignStartDate))
+            else if (string.IsNullOrEmpty(inputCampaignStartDate))
             {
                 campaignStartDate = DateTime.Now;
                 break;
@@ -202,16 +202,16 @@ public class ShopCampaign : ICampaign
 
         while (true)
         {
-            tempCampaignEndDays = Program.AskForInput("  Ange hur många dagar kampanjen ska gälla: ");
+            inputCampaignEndDays = Program.AskForInput("  Ange hur många dagar kampanjen ska gälla: ");
 
-            if (!string.IsNullOrWhiteSpace(tempCampaignEndDays))
+            if (!string.IsNullOrWhiteSpace(inputCampaignEndDays))
             {
-                if (tempCampaignEndDays == "0")
+                if (inputCampaignEndDays == "0")
                 {
                     return;
                 }
 
-                if (int.TryParse(tempCampaignEndDays, out campaignEndDate) && campaignEndDate > 0)
+                if (int.TryParse(inputCampaignEndDays, out campaignEndDate) && campaignEndDate > 0)
                 {
                     break;
                 }
@@ -222,18 +222,18 @@ public class ShopCampaign : ICampaign
 
         while (true)
         {
-            tempCampaignDiscount = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
+            inputCampaignDiscount = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
 
-            if (!string.IsNullOrWhiteSpace(tempCampaignDiscount))
+            if (!string.IsNullOrWhiteSpace(inputCampaignDiscount))
             {
-                if (tempCampaignDiscount == "0")
+                if (inputCampaignDiscount == "0")
                 {
                     return;
                 }
 
                 double productPrice = productList.FetchProductPrice(productId);
 
-                if (tempCampaignDiscount.EndsWith("kr") && double.TryParse(tempCampaignDiscount.Replace("kr", ""), out double campaignDiscountMoney))
+                if (inputCampaignDiscount.EndsWith("kr") && double.TryParse(inputCampaignDiscount.Replace("kr", ""), out double campaignDiscountMoney))
                 {
                     if (campaignDiscountMoney < productPrice)
                     {
@@ -241,7 +241,7 @@ public class ShopCampaign : ICampaign
                         break;
                     }
                 }
-                else if (tempCampaignDiscount.EndsWith("%") && double.TryParse(tempCampaignDiscount.Replace("%", ""), out double campaignDiscountPercent))
+                else if (inputCampaignDiscount.EndsWith("%") && double.TryParse(inputCampaignDiscount.Replace("%", ""), out double campaignDiscountPercent))
                 {
                     if (campaignDiscountPercent > 0 && campaignDiscountPercent < 100)
                     {
@@ -279,10 +279,10 @@ public class ShopCampaign : ICampaign
             int campaignEndDays;
             string campaignDiscount;
 
-            string tempCampaignId;
-            string tempCampaignStartDate;
-            string tempCampaignEndDays;
-            string tempCampaignDiscount;
+            string inputCampaignId;
+            string inputCampaignStartDate;
+            string inputCampaignEndDays;
+            string inputCampaignDiscount;
 
             Console.Clear();
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -319,16 +319,16 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempCampaignId = Program.AskForInput("  Välj kampanj Id: ");
+                inputCampaignId = Program.AskForInput("  Välj kampanj Id: ");
 
-                if (!string.IsNullOrWhiteSpace(tempCampaignId))
+                if (!string.IsNullOrWhiteSpace(inputCampaignId))
                 {
-                    if (tempCampaignId == "0")
+                    if (inputCampaignId == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempCampaignId, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
+                    if (int.TryParse(inputCampaignId, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
                     {
                         break;
                     }
@@ -341,21 +341,21 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempCampaignStartDate = Program.AskForInput($"  Ange nytt start datum för kampanjen ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
+                inputCampaignStartDate = Program.AskForInput($"  Ange nytt start datum för kampanjen ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
 
-                if (!string.IsNullOrWhiteSpace(tempCampaignStartDate))
+                if (!string.IsNullOrWhiteSpace(inputCampaignStartDate))
                 {
-                    if (tempCampaignStartDate == "0")
+                    if (inputCampaignStartDate == "0")
                     {
                         return;
                     }
 
-                    if (DateTime.TryParseExact(tempCampaignStartDate, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out campaignStartDate) && campaignStartDate.Date >= DateTime.Now.Date)
+                    if (DateTime.TryParseExact(inputCampaignStartDate, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out campaignStartDate) && campaignStartDate.Date >= DateTime.Now.Date)
                     {
                         break;
                     }
                 }
-                else if (string.IsNullOrEmpty(tempCampaignStartDate))
+                else if (string.IsNullOrEmpty(inputCampaignStartDate))
                 {
                     campaignStartDate = DateTime.Now;
                     break;
@@ -366,16 +366,16 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempCampaignEndDays = Program.AskForInput($"  Ange hur många dagar kampanjen ska gälla : ");
+                inputCampaignEndDays = Program.AskForInput($"  Ange hur många dagar kampanjen ska gälla : ");
 
-                if (!string.IsNullOrWhiteSpace(tempCampaignEndDays))
+                if (!string.IsNullOrWhiteSpace(inputCampaignEndDays))
                 {
-                    if (tempCampaignEndDays == "0")
+                    if (inputCampaignEndDays == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempCampaignEndDays, out campaignEndDays) && campaignEndDays > 0)
+                    if (int.TryParse(inputCampaignEndDays, out campaignEndDays) && campaignEndDays > 0)
                     {
                         break;
                     }
@@ -386,11 +386,11 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempCampaignDiscount = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
+                inputCampaignDiscount = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
 
-                if (!string.IsNullOrWhiteSpace(tempCampaignDiscount))
+                if (!string.IsNullOrWhiteSpace(inputCampaignDiscount))
                 {
-                    if (tempCampaignDiscount == "0")
+                    if (inputCampaignDiscount == "0")
                     {
                         return;
                     }
@@ -398,7 +398,7 @@ public class ShopCampaign : ICampaign
                     int productId = FetchProductIdFromCampaign(campaignId);
                     double productPrice = ProductList.FetchProductPrice(productId);
 
-                    if (tempCampaignDiscount.EndsWith("kr") && double.TryParse(tempCampaignDiscount.Replace("kr", ""), out double campaignDiscountMoney))
+                    if (inputCampaignDiscount.EndsWith("kr") && double.TryParse(inputCampaignDiscount.Replace("kr", ""), out double campaignDiscountMoney))
                     {
                         if (campaignDiscountMoney < productPrice)
                         {
@@ -406,7 +406,7 @@ public class ShopCampaign : ICampaign
                             break;
                         }
                     }
-                    else if (tempCampaignDiscount.EndsWith("%") && double.TryParse(tempCampaignDiscount.Replace("%", ""), out double campaignDiscountPercent))
+                    else if (inputCampaignDiscount.EndsWith("%") && double.TryParse(inputCampaignDiscount.Replace("%", ""), out double campaignDiscountPercent))
                     {
                         if (campaignDiscountPercent > 0 && campaignDiscountPercent < 100)
                         {
@@ -438,7 +438,7 @@ public class ShopCampaign : ICampaign
 
             int campaignId;
 
-            string tempCampaignId;
+            string inputCampaignId;
 
             Console.Clear();
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -475,16 +475,16 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempCampaignId = Program.AskForInput("  Välj kampajn Id: ");
+                inputCampaignId = Program.AskForInput("  Välj kampajn Id: ");
 
-                if (!string.IsNullOrWhiteSpace(tempCampaignId))
+                if (!string.IsNullOrWhiteSpace(inputCampaignId))
                 {
-                    if (tempCampaignId == "0")
+                    if (inputCampaignId == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempCampaignId, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
+                    if (int.TryParse(inputCampaignId, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
                     {
                         break;
                     }

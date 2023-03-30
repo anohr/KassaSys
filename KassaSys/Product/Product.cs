@@ -79,8 +79,8 @@ public class ShopProduct : IProducts
         double productPrice;
         ProductType productType = ProductType.kg;
 
-        string tempProductPrice;
-        string tempProductType;
+        string inputProductPrice;
+        string inputProductType;
 
         Console.Clear();
         Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -105,16 +105,16 @@ public class ShopProduct : IProducts
 
         while (true)
         {
-            tempProductPrice = Program.AskForInput("   Ange produkt pris (ex 12,34): ");
+            inputProductPrice = Program.AskForInput("   Ange produkt pris (ex 12,34): ");
 
-            if (!string.IsNullOrWhiteSpace(tempProductPrice))
+            if (!string.IsNullOrWhiteSpace(inputProductPrice))
             {
-                if (tempProductPrice == "0")
+                if (inputProductPrice == "0")
                 {
                     return;
                 }
 
-                if (double.TryParse(tempProductPrice.Replace('.', ','), out productPrice) && productPrice > 0)
+                if (double.TryParse(inputProductPrice.Replace('.', ','), out productPrice) && productPrice > 0)
                 {
                     break;
                 }
@@ -125,16 +125,16 @@ public class ShopProduct : IProducts
 
         while (true)
         {
-            tempProductType = Program.AskForInput($"   Ange prisgrupp ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+            inputProductType = Program.AskForInput($"   Ange prisgrupp ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
 
-            if (!string.IsNullOrWhiteSpace(tempProductType))
+            if (!string.IsNullOrWhiteSpace(inputProductType))
             {
-                if (tempProductType == "0")
+                if (inputProductType == "0")
                 {
                     return;
                 }
 
-                if (System.Enum.TryParse<ProductType>(tempProductType, true, out productType))
+                if (System.Enum.TryParse<ProductType>(inputProductType, true, out productType))
                 {
                     break;
                 }
@@ -157,9 +157,9 @@ public class ShopProduct : IProducts
             double productPrice;
             ProductType productType = ProductType.kg;
 
-            string tempProductId;
-            string tempProductPrice;
-            string tempProductType;
+            string inputProductId;
+            string inputProductPrice;
+            string inputProductType;
 
             Console.Clear();
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -194,16 +194,16 @@ public class ShopProduct : IProducts
 
             while (true)
             {
-                tempProductId = Program.AskForInput("  Välj produkt Id: ");
+                inputProductId = Program.AskForInput("  Välj produkt Id: ");
 
-                if (!string.IsNullOrWhiteSpace(tempProductId))
+                if (!string.IsNullOrWhiteSpace(inputProductId))
                 {
-                    if (tempProductId == "0")
+                    if (inputProductId == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempProductId, out productId) && productId > 0 && CheckIfProductExists(productId))
+                    if (int.TryParse(inputProductId, out productId) && productId > 0 && CheckIfProductExists(productId))
                     {
                         break;
                     }
@@ -243,21 +243,21 @@ public class ShopProduct : IProducts
             {
                 var fetcedProductPrice = FetchProductPrice(productId);
 
-                tempProductPrice = Program.AskForInput($"    Ange nytt produkt pris ({fetcedProductPrice:F2}): ");
+                inputProductPrice = Program.AskForInput($"    Ange nytt produkt pris ({fetcedProductPrice:F2}): ");
 
-                if (!string.IsNullOrWhiteSpace(tempProductPrice))
+                if (!string.IsNullOrWhiteSpace(inputProductPrice))
                 {
-                    if (tempProductPrice == "0")
+                    if (inputProductPrice == "0")
                     {
                         return;
                     }
 
-                    if (double.TryParse(tempProductPrice.Replace('.', ','), out productPrice) && productPrice > 0)
+                    if (double.TryParse(inputProductPrice.Replace('.', ','), out productPrice) && productPrice > 0)
                     {
                         break;
                     }
                 }
-                else if (string.IsNullOrEmpty(tempProductPrice))
+                else if (string.IsNullOrEmpty(inputProductPrice))
                 {
                     productPrice = fetcedProductPrice;
 
@@ -271,21 +271,21 @@ public class ShopProduct : IProducts
             {
                 var fetchedProductType = FetchProductType(productId);
 
-                tempProductType = Program.AskForInput($"    Ange ny prisgrupp ({productType}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+                inputProductType = Program.AskForInput($"    Ange ny prisgrupp ({productType}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
 
-                if (!string.IsNullOrWhiteSpace(tempProductType))
+                if (!string.IsNullOrWhiteSpace(inputProductType))
                 {
-                    if (tempProductType == "0")
+                    if (inputProductType == "0")
                     {
                         return;
                     }
 
-                    if (System.Enum.TryParse<ProductType>(tempProductType, true, out productType))
+                    if (System.Enum.TryParse<ProductType>(inputProductType, true, out productType))
                     {
                         break;
                     }
                 }
-                else if (string.IsNullOrEmpty(tempProductType))
+                else if (string.IsNullOrEmpty(inputProductType))
                 {
                     productType = fetchedProductType;
                     break;
@@ -311,7 +311,7 @@ public class ShopProduct : IProducts
         {
             int productId;
 
-            string tempProductId;
+            string inputProductId;
 
             Console.Clear();
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -346,16 +346,16 @@ public class ShopProduct : IProducts
 
             while (true)
             {
-                tempProductId = Program.AskForInput("  Välj produkt Id: ");
+                inputProductId = Program.AskForInput("  Välj produkt Id: ");
 
-                if (!string.IsNullOrWhiteSpace(tempProductId))
+                if (!string.IsNullOrWhiteSpace(inputProductId))
                 {
-                    if (tempProductId == "0")
+                    if (inputProductId == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempProductId, out productId) && productId > 0 && CheckIfProductExists(productId))
+                    if (int.TryParse(inputProductId, out productId) && productId > 0 && CheckIfProductExists(productId))
                     {
                         break;
                     }
