@@ -75,10 +75,12 @@ public class ShopProduct : IProducts
 
     public void AddProduct()
     {
-        string tempInput = string.Empty;
-        string name;
-        double price;
-        ProductType inputEnum = ProductType.kg;
+        string productName;
+        double productPrice;
+        ProductType productType = ProductType.kg;
+
+        string tempProductPrice;
+        string tempProductType;
 
         Console.Clear();
         Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -86,16 +88,14 @@ public class ShopProduct : IProducts
 
         while (true)
         {
-            tempInput = Program.AskForInput("   Ange produkt namn: ");
+            productName = Program.AskForInput("   Ange produkt namn: ");
 
-            if (!string.IsNullOrWhiteSpace(tempInput))
+            if (!string.IsNullOrWhiteSpace(productName))
             {
-                if (tempInput == "0")
+                if (productName == "0")
                 {
                     return;
                 }
-
-                name = tempInput;
 
                 break;
             }
@@ -105,16 +105,16 @@ public class ShopProduct : IProducts
 
         while (true)
         {
-            tempInput = Program.AskForInput("   Ange produkt pris (ex 12,34): ");
+            tempProductPrice = Program.AskForInput("   Ange produkt pris (ex 12,34): ");
 
-            if (!string.IsNullOrWhiteSpace(tempInput))
+            if (!string.IsNullOrWhiteSpace(tempProductPrice))
             {
-                if (tempInput == "0")
+                if (tempProductPrice == "0")
                 {
                     return;
                 }
 
-                if (double.TryParse(tempInput.Replace('.', ','), out price) && price > 0)
+                if (double.TryParse(tempProductPrice.Replace('.', ','), out productPrice) && productPrice > 0)
                 {
                     break;
                 }
@@ -125,19 +125,17 @@ public class ShopProduct : IProducts
 
         while (true)
         {
-            tempInput = Program.AskForInput($"   Ange prisgrupp ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+            tempProductType = Program.AskForInput($"   Ange prisgrupp ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
 
-            if (!string.IsNullOrWhiteSpace(tempInput))
+            if (!string.IsNullOrWhiteSpace(tempProductType))
             {
-                if (tempInput == "0")
+                if (tempProductType == "0")
                 {
                     return;
                 }
 
-                if (System.Enum.TryParse<ProductType>(tempInput, true, out ProductType result))
+                if (System.Enum.TryParse<ProductType>(tempProductType, true, out productType))
                 {
-                    inputEnum = result;
-
                     break;
                 }
             }
@@ -145,7 +143,7 @@ public class ShopProduct : IProducts
             Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
         }
 
-        productList.Add(new ProductList { Id = productList.Count > 0 ? productList.Last().Id + 1 : 1, Name = name, Price = price, Type = inputEnum });
+        productList.Add(new ProductList { Id = productList.Count > 0 ? productList.Last().Id + 1 : 1, Name = productName, Price = productPrice, Type = productType });
 
         SaveToFile(productList);
     }
@@ -154,11 +152,14 @@ public class ShopProduct : IProducts
     {
         while (true)
         {
-            string tempInput = string.Empty;
             int productId;
-            string newName;
-            double newPrice;
-            ProductType newType = ProductType.kg;
+            string productName;
+            double productPrice;
+            ProductType productType = ProductType.kg;
+
+            string tempProductId;
+            string tempProductPrice;
+            string tempProductType;
 
             Console.Clear();
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -193,16 +194,16 @@ public class ShopProduct : IProducts
 
             while (true)
             {
-                tempInput = Program.AskForInput("  Välj produkt Id: ");
+                tempProductId = Program.AskForInput("  Välj produkt Id: ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(tempProductId))
                 {
-                    if (tempInput == "0")
+                    if (tempProductId == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempInput, out productId) && productId > 0 && CheckIfProductExists(productId))
+                    if (int.TryParse(tempProductId, out productId) && productId > 0 && CheckIfProductExists(productId))
                     {
                         break;
                     }
@@ -215,51 +216,23 @@ public class ShopProduct : IProducts
 
             while (true)
             {
-                var productName = FetchProductName(productId);
+                var fetchedProductName = FetchProductName(productId);
 
-                tempInput = Program.AskForInput($"    Ange nytt produkt namn på ({productName}): ");
+                productName = Program.AskForInput($"    Ange nytt produkt namn på ({fetchedProductName}): ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(productName))
                 {
-                    if (tempInput == "0")
+                    if (productName == "0")
                     {
                         return;
                     }
 
-                    newName = tempInput.Trim();
-
                     break;
                 }
-                else if (string.IsNullOrEmpty(tempInput))
+                else if (string.IsNullOrEmpty(productName))
                 {
-                    newName = productName;
-                    break;
-                }
+                    productName = fetchedProductName;
 
-                Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
-            }
-
-            while (true)
-            {
-                var productPrice = FetchProductPrice(productId);
-
-                tempInput = Program.AskForInput($"    Ange nytt produkt pris ({productPrice:F2}): ");
-
-                if (!string.IsNullOrWhiteSpace(tempInput))
-                {
-                    if (tempInput == "0")
-                    {
-                        return;
-                    }
-
-                    if (double.TryParse(tempInput.Replace('.', ','), out newPrice) && newPrice > 0)
-                    {
-                        break;
-                    }
-                }
-                else if (string.IsNullOrEmpty(tempInput))
-                {
-                    newPrice = productPrice;
                     break;
                 }
 
@@ -268,27 +241,53 @@ public class ShopProduct : IProducts
 
             while (true)
             {
-                var productType = FetchProductType(productId);
+                var fetcedProductPrice = FetchProductPrice(productId);
 
-                tempInput = Program.AskForInput($"    Ange ny prisgrupp ({productType}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+                tempProductPrice = Program.AskForInput($"    Ange nytt produkt pris ({fetcedProductPrice:F2}): ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(tempProductPrice))
                 {
-                    if (tempInput == "0")
+                    if (tempProductPrice == "0")
                     {
                         return;
                     }
 
-                    if (System.Enum.TryParse<ProductType>(tempInput, true, out ProductType type))
+                    if (double.TryParse(tempProductPrice.Replace('.', ','), out productPrice) && productPrice > 0)
                     {
-                        newType = type;
-
                         break;
                     }
                 }
-                else if (string.IsNullOrEmpty(tempInput))
+                else if (string.IsNullOrEmpty(tempProductPrice))
                 {
-                    newType = productType;
+                    productPrice = fetcedProductPrice;
+
+                    break;
+                }
+
+                Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
+            }
+
+            while (true)
+            {
+                var fetchedProductType = FetchProductType(productId);
+
+                tempProductType = Program.AskForInput($"    Ange ny prisgrupp ({productType}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+
+                if (!string.IsNullOrWhiteSpace(tempProductType))
+                {
+                    if (tempProductType == "0")
+                    {
+                        return;
+                    }
+
+                    if (System.Enum.TryParse<ProductType>(tempProductType, true, out productType))
+                    {
+                        break;
+                    }
+                }
+                else if (string.IsNullOrEmpty(tempProductType))
+                {
+                    productType = fetchedProductType;
                     break;
                 }
 
@@ -297,9 +296,9 @@ public class ShopProduct : IProducts
 
             productList.Where(product => product.Id == productId).ToList().ForEach(product =>
             {
-                product.Name = newName;
-                product.Price = newPrice;
-                product.Type = newType;
+                product.Name = productName;
+                product.Price = productPrice;
+                product.Type = productType;
             });
 
             SaveToFile(productList);
@@ -310,8 +309,9 @@ public class ShopProduct : IProducts
     {
         while (true)
         {
-            string tempInput = string.Empty;
             int productId;
+
+            string tempProductId;
 
             Console.Clear();
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -346,16 +346,16 @@ public class ShopProduct : IProducts
 
             while (true)
             {
-                tempInput = Program.AskForInput("  Välj produkt Id: ");
+                tempProductId = Program.AskForInput("  Välj produkt Id: ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(tempProductId))
                 {
-                    if (tempInput == "0")
+                    if (tempProductId == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempInput, out productId) && productId > 0 && CheckIfProductExists(productId))
+                    if (int.TryParse(tempProductId, out productId) && productId > 0 && CheckIfProductExists(productId))
                     {
                         break;
                     }

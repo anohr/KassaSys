@@ -110,12 +110,17 @@ public class ShopCampaign : ICampaign
     {
         ShopProduct productList = new ShopProduct();
 
-        string tempInput = string.Empty;
-        string dateFormat = "yyyy-MM-dd";
+            string dateFormat = "yyyy-MM-dd";
+
         int productId;
-        string discount = "";
-        DateTime startDate;
-        int endDate;
+        DateTime campaignStartDate;
+        int campaignEndDate;
+        string campaignDiscount;
+
+        string tempProductId;
+        string tempCampaignStartDate;
+        string tempCampaignEndDays;
+        string tempCampaignDiscount;
 
         Console.Clear();
         Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
@@ -152,16 +157,16 @@ public class ShopCampaign : ICampaign
 
         while (true)
         {
-            tempInput = Program.AskForInput("  Välj produkt Id: ");
+            tempProductId = Program.AskForInput("  Välj produkt Id: ");
 
-            if (!string.IsNullOrWhiteSpace(tempInput))
+            if (!string.IsNullOrWhiteSpace(tempProductId))
             {
-                if (tempInput == "0")
+                if (tempProductId == "0")
                 {
                     return;
                 }
 
-                if (int.TryParse(tempInput, out productId) && productId > 0 && productList.CheckIfProductExists(productId))
+                if (int.TryParse(tempProductId, out productId) && productId > 0 && productList.CheckIfProductExists(productId))
                 {
                     break;
                 }
@@ -172,23 +177,23 @@ public class ShopCampaign : ICampaign
 
         while (true)
         {
-            tempInput = Program.AskForInput($"  Ange start datum ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
+            tempCampaignStartDate = Program.AskForInput($"  Ange start datum ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
 
-            if (!string.IsNullOrWhiteSpace(tempInput))
+            if (!string.IsNullOrWhiteSpace(tempCampaignStartDate))
             {
-                if (tempInput == "0")
+                if (tempCampaignStartDate == "0")
                 {
                     return;
                 }
 
-                if (DateTime.TryParseExact(tempInput, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out startDate) && startDate.Date >= DateTime.Now.Date)
+                if (DateTime.TryParseExact(tempCampaignStartDate, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out campaignStartDate) && campaignStartDate.Date >= DateTime.Now.Date)
                 {
                     break;
                 }
             }
-            else if (string.IsNullOrEmpty(tempInput))
+            else if (string.IsNullOrEmpty(tempCampaignStartDate))
             {
-                startDate = DateTime.Now;
+                campaignStartDate = DateTime.Now;
                 break;
             }
 
@@ -197,16 +202,16 @@ public class ShopCampaign : ICampaign
 
         while (true)
         {
-            tempInput = Program.AskForInput("  Ange hur många dagar kampanjen ska gälla: ");
+            tempCampaignEndDays = Program.AskForInput("  Ange hur många dagar kampanjen ska gälla: ");
 
-            if (!string.IsNullOrWhiteSpace(tempInput))
+            if (!string.IsNullOrWhiteSpace(tempCampaignEndDays))
             {
-                if (tempInput == "0")
+                if (tempCampaignEndDays == "0")
                 {
                     return;
                 }
 
-                if (int.TryParse(tempInput, out endDate) && endDate > 0)
+                if (int.TryParse(tempCampaignEndDays, out campaignEndDate) && campaignEndDate > 0)
                 {
                     break;
                 }
@@ -217,30 +222,30 @@ public class ShopCampaign : ICampaign
 
         while (true)
         {
-            tempInput = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
+            tempCampaignDiscount = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
 
-            if (!string.IsNullOrWhiteSpace(tempInput))
+            if (!string.IsNullOrWhiteSpace(tempCampaignDiscount))
             {
-                if (tempInput == "0")
+                if (tempCampaignDiscount == "0")
                 {
                     return;
                 }
 
                 double productPrice = productList.FetchProductPrice(productId);
 
-                if (tempInput.EndsWith("kr") && double.TryParse(tempInput.Replace("kr", ""), out double discountMoney))
+                if (tempCampaignDiscount.EndsWith("kr") && double.TryParse(tempCampaignDiscount.Replace("kr", ""), out double campaignDiscountMoney))
                 {
-                    if (discountMoney < productPrice)
+                    if (campaignDiscountMoney < productPrice)
                     {
-                        discount = $"{discountMoney}kr";
+                        campaignDiscount = $"{campaignDiscountMoney}kr";
                         break;
                     }
                 }
-                else if (tempInput.EndsWith("%") && double.TryParse(tempInput.Replace("%", ""), out double discountPercent))
+                else if (tempCampaignDiscount.EndsWith("%") && double.TryParse(tempCampaignDiscount.Replace("%", ""), out double campaignDiscountPercent))
                 {
-                    if (discountPercent < productPrice)
+                    if (campaignDiscountPercent > 0 && campaignDiscountPercent < 100)
                     {
-                        discount = $"{discountPercent}%";
+                        campaignDiscount = $"{campaignDiscountPercent}%";
                         break;
                     }
                 }
@@ -253,9 +258,9 @@ public class ShopCampaign : ICampaign
         {
             Id = campaignList.Count > 0 ? campaignList.Last().Id + 1 : 1,
             ProductID = productId,
-            StartDate = startDate,
-            EndDate = endDate,
-            Discount = discount
+            StartDate = campaignStartDate,
+            EndDate = campaignEndDate,
+            Discount = campaignDiscount
         });
 
         SaveToFile(campaignList);
@@ -265,20 +270,25 @@ public class ShopCampaign : ICampaign
     {
         while (true)
         {
-            ShopProduct productList = new ShopProduct();
+            ShopProduct ProductList = new ShopProduct();
 
-            string tempInput = string.Empty;
             string dateFormat = "yyyy-MM-dd";
+
             int campaignId;
-            DateTime startDate;
-            int endDate;
-            string discount = "0";
+            DateTime campaignStartDate;
+            int campaignEndDays;
+            string campaignDiscount;
+
+            string tempCampaignId;
+            string tempCampaignStartDate;
+            string tempCampaignEndDays;
+            string tempCampaignDiscount;
 
             Console.Clear();
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
             Console.WriteLine("  - Uppdatera en kampanj -\n");
 
-            Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4}\n", "Id", "Produktnamn", "Start", "Slut", "Rabatt");
+            Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4,-15} {5}\n", "Id", "Produktnamn", "Start", "Slut", "Pris", "Rabatt");
 
             for (int i = 0; i < campaignList.Count; i++)
             {
@@ -289,12 +299,12 @@ public class ShopCampaign : ICampaign
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                 }
 
-                Console.WriteLine($"    {campaign.Id,-3} {productList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount)}");
+                var productId = FetchProductIdFromCampaign(campaign.Id);
+
+                Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {ProductList.FetchProductPrice(productId),-15:C} {(campaign.Discount)}");
 
                 Console.ResetColor();
             }
-
-            Console.ResetColor();
 
             if (campaignList.Count == 0)
             {
@@ -309,16 +319,16 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempInput = Program.AskForInput("  Välj produkt Id: ");
+                tempCampaignId = Program.AskForInput("  Välj kampanj Id: ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(tempCampaignId))
                 {
-                    if (tempInput == "0")
+                    if (tempCampaignId == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempInput, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
+                    if (int.TryParse(tempCampaignId, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
                     {
                         break;
                     }
@@ -331,23 +341,23 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempInput = Program.AskForInput($"  Ange nytt start datum för kampanjen ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
+                tempCampaignStartDate = Program.AskForInput($"  Ange nytt start datum för kampanjen ({DateTime.Now.ToString("yyyy-MM-dd")}): ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(tempCampaignStartDate))
                 {
-                    if (tempInput == "0")
+                    if (tempCampaignStartDate == "0")
                     {
                         return;
                     }
 
-                    if (DateTime.TryParseExact(tempInput, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out startDate) && startDate.Date >= DateTime.Now.Date)
+                    if (DateTime.TryParseExact(tempCampaignStartDate, dateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out campaignStartDate) && campaignStartDate.Date >= DateTime.Now.Date)
                     {
                         break;
                     }
                 }
-                else if (string.IsNullOrEmpty(tempInput))
+                else if (string.IsNullOrEmpty(tempCampaignStartDate))
                 {
-                    startDate = DateTime.Now;
+                    campaignStartDate = DateTime.Now;
                     break;
                 }
 
@@ -356,16 +366,16 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempInput = Program.AskForInput($"  Ange hur många dagar kampanjen ska gälla : ");
+                tempCampaignEndDays = Program.AskForInput($"  Ange hur många dagar kampanjen ska gälla : ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(tempCampaignEndDays))
                 {
-                    if (tempInput == "0")
+                    if (tempCampaignEndDays == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempInput, out endDate) && endDate > 0)
+                    if (int.TryParse(tempCampaignEndDays, out campaignEndDays) && campaignEndDays > 0)
                     {
                         break;
                     }
@@ -376,31 +386,31 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempInput = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
+                tempCampaignDiscount = Program.AskForInput("  Ange hur mycket rabatt (avsluta med kr eller %): ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(tempCampaignDiscount))
                 {
-                    if (tempInput == "0")
+                    if (tempCampaignDiscount == "0")
                     {
                         return;
                     }
 
                     int productId = FetchProductIdFromCampaign(campaignId);
-                    double productPrice = productList.FetchProductPrice(productId);
+                    double productPrice = ProductList.FetchProductPrice(productId);
 
-                    if (tempInput.EndsWith("kr") && double.TryParse(tempInput.Replace("kr", ""), out double discountMoney))
+                    if (tempCampaignDiscount.EndsWith("kr") && double.TryParse(tempCampaignDiscount.Replace("kr", ""), out double campaignDiscountMoney))
                     {
-                        if (discountMoney < productPrice)
+                        if (campaignDiscountMoney < productPrice)
                         {
-                            discount = $"{discountMoney}kr";
+                            campaignDiscount = $"{campaignDiscountMoney}kr";
                             break;
                         }
                     }
-                    else if (tempInput.EndsWith("%") && double.TryParse(tempInput.Replace("%", ""), out double discountPercent))
+                    else if (tempCampaignDiscount.EndsWith("%") && double.TryParse(tempCampaignDiscount.Replace("%", ""), out double campaignDiscountPercent))
                     {
-                        if (discountPercent < productPrice)
+                        if (campaignDiscountPercent > 0 && campaignDiscountPercent < 100)
                         {
-                            discount = $"{discountPercent}%";
+                            campaignDiscount = $"{campaignDiscountPercent}%";
                             break;
                         }
                     }
@@ -411,9 +421,9 @@ public class ShopCampaign : ICampaign
 
             campaignList.Where(campaign => campaign.Id == campaignId).ToList().ForEach(campaign =>
             {
-                campaign.StartDate = startDate;
-                campaign.EndDate = endDate;
-                campaign.Discount = discount;
+                campaign.StartDate = campaignStartDate;
+                campaign.EndDate = campaignEndDays;
+                campaign.Discount = campaignDiscount;
             });
 
             SaveToFile(campaignList);
@@ -426,14 +436,15 @@ public class ShopCampaign : ICampaign
         {
             ShopProduct ProductList = new ShopProduct();
 
-            string tempInput = string.Empty;
             int campaignId;
+
+            string tempCampaignId;
 
             Console.Clear();
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
             Console.WriteLine("  - Ta bort en kampanj -\n");
 
-            Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4}\n", "Id", "Produktnamn", "Start datum", "Slut datum", "Rabatt");
+            Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4,-15} {5}\n", "Id", "Produktnamn", "Start", "Slut", "Pris", "Rabatt");
 
             for (int i = 0; i < campaignList.Count; i++)
             {
@@ -444,12 +455,12 @@ public class ShopCampaign : ICampaign
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                 }
 
-                Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {(campaign.Discount)}");
+                var productId = FetchProductIdFromCampaign(campaign.Id);
+
+                Console.WriteLine($"    {campaign.Id,-3} {ProductList.FetchProductName(campaign.ProductID),-15} {campaign.StartDate.ToString("yyyy-MM-dd"),-15} {campaign.StartDate.AddDays(campaign.EndDate).ToString("yyyy-MM-dd"),-15} {ProductList.FetchProductPrice(productId),-15:C} {(campaign.Discount)}");
 
                 Console.ResetColor();
             }
-
-            Console.ResetColor();
 
             if (campaignList.Count == 0)
             {
@@ -464,16 +475,16 @@ public class ShopCampaign : ICampaign
 
             while (true)
             {
-                tempInput = Program.AskForInput("  Välj produkt Id: ");
+                tempCampaignId = Program.AskForInput("  Välj kampajn Id: ");
 
-                if (!string.IsNullOrWhiteSpace(tempInput))
+                if (!string.IsNullOrWhiteSpace(tempCampaignId))
                 {
-                    if (tempInput == "0")
+                    if (tempCampaignId == "0")
                     {
                         return;
                     }
 
-                    if (int.TryParse(tempInput, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
+                    if (int.TryParse(tempCampaignId, out campaignId) && campaignId > 0 && CheckIfCampaignExists(campaignId))
                     {
                         break;
                     }
