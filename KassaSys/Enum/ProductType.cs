@@ -2,6 +2,6 @@
 
 public enum ProductType
 {
-	kg,
-	st
+    kg,
+    st
 }

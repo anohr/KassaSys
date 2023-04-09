@@ -73,6 +73,7 @@ public class ShopProduct : IProducts
         return productList.Where(product => product.Id == productId).Select(product => product.Type).FirstOrDefault();
     }
 
+    #region Addproduct
     public void AddProduct()
     {
         string productName;
@@ -105,7 +106,7 @@ public class ShopProduct : IProducts
 
         while (true)
         {
-            inputProductPrice = Program.AskForInput("   Ange produkt pris (ex 12,34): ");
+            inputProductPrice = Program.AskForInput("   Ange produkt pris [ex 12,34]: ");
 
             if (!string.IsNullOrWhiteSpace(inputProductPrice))
             {
@@ -125,7 +126,7 @@ public class ShopProduct : IProducts
 
         while (true)
         {
-            inputProductType = Program.AskForInput($"   Ange prisgrupp ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+            inputProductType = Program.AskForInput($"   Ange prisgrupp [{string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}]: ");
 
             if (!string.IsNullOrWhiteSpace(inputProductType))
             {
@@ -147,7 +148,9 @@ public class ShopProduct : IProducts
 
         SaveToFile(productList);
     }
+    #endregion
 
+    #region UpdateProduct
     public void UpdateProduct()
     {
         while (true)
@@ -167,20 +170,6 @@ public class ShopProduct : IProducts
 
             Console.WriteLine("    {0,-3} {1,-15} {2,-9}\n", "Id", "Namn", "Pris");
 
-            for (int i = 0; i < productList.Count; i++)
-            {
-                var product = productList[i];
-
-                if (i % 2 == 0)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                }
-
-                Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,8:F2}   {product.Type}");
-
-                Console.ResetColor();
-            }
-
             if (productList.Count == 0)
             {
                 Console.WriteLine("     Inga produkter att uppdatera...\n");
@@ -188,6 +177,22 @@ public class ShopProduct : IProducts
                 Console.ReadKey();
 
                 return;
+            }
+            else
+            {
+                for (int i = 0; i < productList.Count; i++)
+                {
+                    var product = productList[i];
+
+                    if (i % 2 == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    }
+
+                    Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,8:F2}   {product.Type}");
+
+                    Console.ResetColor();
+                }
             }
 
             Console.Write("\n");
@@ -214,11 +219,15 @@ public class ShopProduct : IProducts
 
             Console.Write("\n");
 
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("    Tryck enter för att acceptera innehållet inom ()\n");
+            Console.ResetColor();
+
             while (true)
             {
                 var fetchedProductName = FetchProductName(productId);
 
-                productName = Program.AskForInput($"    Ange nytt produkt namn på ({fetchedProductName}): ");
+                productName = Program.AskForInput($"    Ange nytt produkt namn på  ({fetchedProductName}): ");
 
                 if (!string.IsNullOrWhiteSpace(productName))
                 {
@@ -243,7 +252,7 @@ public class ShopProduct : IProducts
             {
                 var fetcedProductPrice = FetchProductPrice(productId);
 
-                inputProductPrice = Program.AskForInput($"    Ange nytt produkt pris ({fetcedProductPrice:F2}): ");
+                inputProductPrice = Program.AskForInput($"    Ange nytt produkt pris     ({fetcedProductPrice:F2}): ");
 
                 if (!string.IsNullOrWhiteSpace(inputProductPrice))
                 {
@@ -271,7 +280,7 @@ public class ShopProduct : IProducts
             {
                 var fetchedProductType = FetchProductType(productId);
 
-                inputProductType = Program.AskForInput($"    Ange ny prisgrupp ({productType}) ({string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}): ");
+                inputProductType = Program.AskForInput($"    Ange ny prisgrupp [{string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}] ({productType}): ");
 
                 if (!string.IsNullOrWhiteSpace(inputProductType))
                 {
@@ -304,7 +313,9 @@ public class ShopProduct : IProducts
             SaveToFile(productList);
         }
     }
+    #endregion
 
+    #region RemoveProduct
     public void RemoveProduct()
     {
         while (true)
@@ -319,20 +330,6 @@ public class ShopProduct : IProducts
 
             Console.WriteLine("    {0,-3} {1,-15} {2,-10} {3}\n", "Id", "Namn", "Pris", "Prisgrupp");
 
-            for (int i = 0; i < productList.Count; i++)
-            {
-                var product = productList[i];
-
-                if (i % 2 == 0)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                }
-
-                Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,8:F2}   {product.Type}");
-
-                Console.ResetColor();
-            }
-
             if (productList.Count == 0)
             {
                 Console.WriteLine("     Inga produkter att ta bort...\n");
@@ -340,6 +337,22 @@ public class ShopProduct : IProducts
                 Console.ReadKey();
 
                 return;
+            }
+            else
+            {
+                for (int i = 0; i < productList.Count; i++)
+                {
+                    var product = productList[i];
+
+                    if (i % 2 == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    }
+
+                    Console.WriteLine($"    {product.Id,-3} {product.Name,-15} {product.Price,8:F2}   {product.Type}");
+
+                    Console.ResetColor();
+                }
             }
 
             Console.Write("\n");
@@ -376,4 +389,5 @@ public class ShopProduct : IProducts
             campaignList.RemoveCampaign(productId);
         }
     }
+    #endregion
 }

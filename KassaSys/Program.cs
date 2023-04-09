@@ -1,132 +1,140 @@
-﻿using KassaSys.Register;
-using KassaSys.Campaign;
+﻿using KassaSys.Campaign;
 using KassaSys.Product;
+using KassaSys.Register;
 
 namespace KassaSys;
 
 public class Program
 {
-	static void Main()
-	{
-		while (true)
-		{
-			Console.Clear();
-			Console.WriteLine("KASSA");
-			Console.WriteLine("1. Ny kund");
-			Console.WriteLine("2. Admin");
-			Console.WriteLine("0. Avsluta");
-			bool checkInput = int.TryParse(Console.ReadLine(), out int menuChoice);
+    private static void Main()
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("KASSA");
+            Console.WriteLine("1. Ny kund");
+            Console.WriteLine("2. Admin");
+            Console.WriteLine("0. Avsluta");
+            bool checkInput = int.TryParse(Console.ReadLine(), out int menuChoice);
 
-			if (checkInput)
-			{
-				switch (menuChoice)
-				{
-					case 0:
-						return;
-					case 1:
-						Register();
-						break;
-					case 2:
-						Admin();
-						break;
-				}
-			}
-		}
-	}
+            if (checkInput)
+            {
+                switch (menuChoice)
+                {
+                    case 0:
+                        return;
 
-	public static void Register()
-	{
-		CashRegister CashRegister = new CashRegister();
+                    case 1:
+                        Register();
+                        break;
 
-		while (true)
-		{
-			Console.Clear();
-			Console.WriteLine("KASSA");
+                    case 2:
+                        Admin();
+                        break;
+                }
+            }
+        }
+    }
 
-			CashRegister.PrintReceipt();
+    public static void Register()
+    {
+        CashRegister CashRegister = new CashRegister();
 
-			Console.WriteLine("kommando:\n<productid> <antal>\nPAY");
-			Console.Write("Kommando:");
-			string inputToCheck = Console.ReadLine();
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("KASSA");
 
-			if (inputToCheck.ToLower() == "pay")
-			{
-				CashRegister.SaveReceipt();
-				CashRegister = new CashRegister();
-				return;
-			}
-			else if (inputToCheck.Contains(' '))
-			{
-				string[] args = inputToCheck.Split(' ');
+            CashRegister.PrintReceipt();
 
-				if (int.TryParse(args[0], out int productID) && int.TryParse(args[1], out int productAmount))
-				{
-					CashRegister.AddToReceipt(productID, productAmount);
-				}
-			}
-		}
-	}
+            Console.WriteLine("kommando:\n<productid> <antal>\nPAY");
+            Console.Write("Kommando:");
+            string inputToCheck = Console.ReadLine();
 
-	static void Admin()
-	{
-		ShopProduct Product = new ShopProduct();
-		ShopCampaign Campaign = new ShopCampaign();
+            if (inputToCheck.ToLower() == "pay")
+            {
+                CashRegister.SaveReceipt();
+                CashRegister = new CashRegister();
+                return;
+            }
+            else if (inputToCheck.Contains(' '))
+            {
+                string[] args = inputToCheck.Split(' ');
 
-		while (true)
-		{
-			Console.Clear();
-			Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
-			Console.WriteLine(" Produkt:");
-			Console.WriteLine("    1. Lägg till");
-			Console.WriteLine("    2. Uppdatera");
-			Console.WriteLine("    3. Ta bort");
-			Console.WriteLine("\n Kampanj:");
-			Console.WriteLine("    4. Lägg till");
-			Console.WriteLine("    5. Uppdatera");
-			Console.WriteLine("    6. Ta bort\n");
-			Console.Write(" Gör ditt val: ");
-			bool checkInput = int.TryParse(Console.ReadLine(), out int menuChoice);
+                if (int.TryParse(args[0], out int productID) && int.TryParse(args[1], out int productAmount))
+                {
+                    CashRegister.AddToReceipt(productID, productAmount);
+                }
+            }
+        }
+    }
 
-			if (checkInput)
-			{
-				switch (menuChoice)
-				{
-					case 0:
-						return;
-					case 1:
-						Product.AddProduct();
-						break;
-					case 2:
-						Product.UpdateProduct();
-						break;
-					case 3:
-						Product.RemoveProduct();
-						break;
-					case 4:
-						Campaign.AddCampaign();
-						break;
-					case 5:
-						Campaign.UpdateCampaign();
-						break;
-					case 6:
-						Campaign.RemoveCampaign();
-						break;
-				}
-			}
-		}
-	}
+    private static void Admin()
+    {
+        ShopProduct Product = new ShopProduct();
+        ShopCampaign Campaign = new ShopCampaign();
 
-	public static string AskForInput(string str)
-	{
-		Console.Write(str);
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
+            Console.WriteLine(" Produkt:");
+            Console.WriteLine("    1. Lägg till");
+            Console.WriteLine("    2. Uppdatera");
+            Console.WriteLine("    3. Ta bort");
+            Console.WriteLine("\n Kampanj:");
+            Console.WriteLine("    4. Lägg till");
+            Console.WriteLine("    5. Uppdatera");
+            Console.WriteLine("    6. Ta bort\n");
+            Console.Write(" Gör ditt val: ");
+            bool checkInput = int.TryParse(Console.ReadLine(), out int menuChoice);
 
-		return Console.ReadLine().Trim();
-	}
+            if (checkInput)
+            {
+                switch (menuChoice)
+                {
+                    case 0:
+                        return;
 
-	public static void ErrorPrint(string str)
-	{
-		Console.ForegroundColor = ConsoleColor.Red;
-		Console.WriteLine(str);
-		Console.ResetColor();
-	}
+                    case 1:
+                        Product.AddProduct();
+                        break;
+
+                    case 2:
+                        Product.UpdateProduct();
+                        break;
+
+                    case 3:
+                        Product.RemoveProduct();
+                        break;
+
+                    case 4:
+                        Campaign.AddCampaign();
+                        break;
+
+                    case 5:
+                        Campaign.UpdateCampaign();
+                        break;
+
+                    case 6:
+                        Campaign.RemoveCampaign();
+                        break;
+                }
+            }
+        }
+    }
+
+    public static string AskForInput(string str)
+    {
+        Console.Write(str);
+
+        return Console.ReadLine().Trim();
+    }
+
+    public static void ErrorPrint(string str)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(str);
+        Console.ResetColor();
+    }
 }
