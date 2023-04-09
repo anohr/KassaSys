@@ -1,16 +1,15 @@
-﻿using KassaSys.Campaign;
-using KassaSys.Enum;
+﻿using KassaSys.Enum;
 
 namespace KassaSys.Product;
 
-public class ShopProduct : IProducts
+public class Product : IProducts
 {
     private string _filePath = @".\product.txt";
     private string _splitString = " | ";
 
     public List<ProductList> productList = new List<ProductList>();
 
-    public ShopProduct()
+    public Product()
     {
         productList = FetchProductFromFile();
     }
@@ -74,12 +73,14 @@ public class ShopProduct : IProducts
     }
 
     #region Addproduct
+
     public void AddProduct()
     {
         string productName;
         double productPrice;
         ProductType productType = ProductType.kg;
 
+        string inputProductName;
         string inputProductPrice;
         string inputProductType;
 
@@ -89,14 +90,16 @@ public class ShopProduct : IProducts
 
         while (true)
         {
-            productName = Program.AskForInput("   Ange produkt namn: ");
+            inputProductName = Program.AskForInput("   Ange produkt namn: ");
 
-            if (!string.IsNullOrWhiteSpace(productName))
+            if (!string.IsNullOrWhiteSpace(inputProductName))
             {
-                if (productName == "0")
+                if (string.Compare(inputProductName, "0", StringComparison.Ordinal) == 0)
                 {
                     return;
                 }
+
+                productName = inputProductName;
 
                 break;
             }
@@ -110,7 +113,7 @@ public class ShopProduct : IProducts
 
             if (!string.IsNullOrWhiteSpace(inputProductPrice))
             {
-                if (inputProductPrice == "0")
+                if (string.Compare(inputProductPrice, "0", StringComparison.Ordinal) == 0)
                 {
                     return;
                 }
@@ -132,7 +135,7 @@ public class ShopProduct : IProducts
 
             if (!string.IsNullOrWhiteSpace(inputProductType))
             {
-                if (inputProductType == "0")
+                if (string.Compare(inputProductType, "0", StringComparison.Ordinal) == 0)
                 {
                     return;
                 }
@@ -150,9 +153,11 @@ public class ShopProduct : IProducts
 
         SaveToFile(productList);
     }
-    #endregion
+
+    #endregion Addproduct
 
     #region UpdateProduct
+
     public void UpdateProduct()
     {
         while (true)
@@ -170,7 +175,7 @@ public class ShopProduct : IProducts
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
             Console.WriteLine("  - Uppdatera namn och pris på en produkt -\n");
 
-            Console.WriteLine("    {0,-3} {1,-15} {2,-9}\n", "Id", "Namn", "Pris");
+            Console.WriteLine($"    {"Id",-3} {"Namn",-15} {"Pris",-9}\n");
 
             if (productList.Count == 0)
             {
@@ -205,7 +210,7 @@ public class ShopProduct : IProducts
 
                 if (!string.IsNullOrWhiteSpace(inputProductId))
                 {
-                    if (inputProductId == "0")
+                    if (string.Compare(inputProductId, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -233,7 +238,7 @@ public class ShopProduct : IProducts
 
                 if (!string.IsNullOrWhiteSpace(productName))
                 {
-                    if (productName == "0")
+                    if (string.Compare(productName, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -258,7 +263,7 @@ public class ShopProduct : IProducts
 
                 if (!string.IsNullOrWhiteSpace(inputProductPrice))
                 {
-                    if (inputProductPrice == "0")
+                    if (string.Compare(inputProductPrice, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -286,7 +291,7 @@ public class ShopProduct : IProducts
 
                 if (!string.IsNullOrWhiteSpace(inputProductType))
                 {
-                    if (inputProductType == "0")
+                    if (string.Compare(inputProductType, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -315,9 +320,11 @@ public class ShopProduct : IProducts
             SaveToFile(productList);
         }
     }
-    #endregion
+
+    #endregion UpdateProduct
 
     #region RemoveProduct
+
     public void RemoveProduct()
     {
         while (true)
@@ -330,7 +337,7 @@ public class ShopProduct : IProducts
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
             Console.WriteLine("  - Ta bort en produkt -\n");
 
-            Console.WriteLine("    {0,-3} {1,-15} {2,-10} {3}\n", "Id", "Namn", "Pris", "Prisgrupp");
+            Console.WriteLine($"    {"Id",-3} {"Namn",-15} {"Pris",-10} {"Prisgrupp"}\n");
 
             if (productList.Count == 0)
             {
@@ -365,7 +372,7 @@ public class ShopProduct : IProducts
 
                 if (!string.IsNullOrWhiteSpace(inputProductId))
                 {
-                    if (inputProductId == "0")
+                    if (string.Compare(inputProductId, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -386,10 +393,11 @@ public class ShopProduct : IProducts
 
             SaveToFile(productList);
 
-            ShopCampaign campaignList = new ShopCampaign();
+            Campaign.Campaign campaignList = new Campaign.Campaign();
 
             campaignList.RemoveCampaign(productId);
         }
     }
-    #endregion
+
+    #endregion RemoveProduct
 }

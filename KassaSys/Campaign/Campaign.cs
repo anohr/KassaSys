@@ -2,14 +2,14 @@
 
 namespace KassaSys.Campaign;
 
-public class ShopCampaign : ICampaign
+public class Campaign : ICampaign
 {
     private string _filePath = @".\campaign.txt";
     private string _splitString = " | ";
 
     public List<CampaignList> campaignList = new List<CampaignList>();
 
-    public ShopCampaign()
+    public Campaign()
     {
         campaignList = FetchCampaignFromFile();
     }
@@ -82,11 +82,11 @@ public class ShopCampaign : ICampaign
         return bestDiscount ?? "0" + typeOfDiscount;
     }
 
-    public string CalculateBestDiscount(int productId, ShopProduct ProductList = null)
+    public string CalculateBestDiscount(int productId, Product.Product ProductList = null)
     {
         // Stefan fix. :)
         if (ProductList == null)
-            ProductList = new ShopProduct();
+            ProductList = new Product.Product();
 
         var bestPercentDiscount = FetchBestDiscountForEachType(productId, "%");
         var bestMoneyDiscount = FetchBestDiscountForEachType(productId, "kr");
@@ -123,7 +123,7 @@ public class ShopCampaign : ICampaign
     #region AddCampaign
     public void AddCampaign()
     {
-        ShopProduct productList = new ShopProduct();
+        Product.Product productList = new Product.Product();
 
         string dateFormat = "yyyy-MM-dd";
 
@@ -141,7 +141,7 @@ public class ShopCampaign : ICampaign
         Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
         Console.WriteLine("  - Lägg till en ny kampanj -\n");
 
-        Console.WriteLine("    {0,-3} {1,-20} {2,-9}\n", "Id", "Produkt namn", "Pris");
+        Console.WriteLine($"    {"Id",-3} {"Produkt namn",-20} {"Pris",-9}\n");
 
         if (productList.FetchList().Count == 0)
         {
@@ -176,7 +176,7 @@ public class ShopCampaign : ICampaign
 
             if (!string.IsNullOrWhiteSpace(inputProductId))
             {
-                if (inputProductId == "0")
+                if (string.Compare(inputProductId, "0", StringComparison.Ordinal) == 0)
                 {
                     return;
                 }
@@ -203,7 +203,7 @@ public class ShopCampaign : ICampaign
 
             if (!string.IsNullOrWhiteSpace(inputCampaignStartDate))
             {
-                if (inputCampaignStartDate == "0")
+                if (string.Compare(inputCampaignStartDate, "0", StringComparison.Ordinal) == 0)
                 {
                     return;
                 }
@@ -228,7 +228,7 @@ public class ShopCampaign : ICampaign
 
             if (!string.IsNullOrWhiteSpace(inputCampaignEndDays))
             {
-                if (inputCampaignEndDays == "0")
+                if (string.Compare(inputCampaignEndDays, "0", StringComparison.Ordinal) == 0)
                 {
                     return;
                 }
@@ -252,7 +252,7 @@ public class ShopCampaign : ICampaign
 
             if (!string.IsNullOrWhiteSpace(inputCampaignDiscount))
             {
-                if (inputCampaignDiscount == "0")
+                if (string.Compare(inputCampaignDiscount, "0", StringComparison.Ordinal) == 0)
                 {
                     return;
                 }
@@ -302,7 +302,7 @@ public class ShopCampaign : ICampaign
     {
         while (true)
         {
-            ShopProduct ProductList = new ShopProduct();
+            Product.Product ProductList = new Product.Product();
 
             string dateFormat = "yyyy-MM-dd";
 
@@ -320,7 +320,7 @@ public class ShopCampaign : ICampaign
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
             Console.WriteLine("  - Uppdatera en kampanj -\n");
 
-            Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4,-15} {5}\n", "Id", "Produktnamn", "Start", "Slut", "Pris", "Rabatt");
+            Console.WriteLine($"    {"Id",-3} {"Produktnamn",-15} {"Start",-15} {"Slut",-15} {"Pris",-15} {"Rabatt"}\n");
 
             if (campaignList.Count == 0)
             {
@@ -357,7 +357,7 @@ public class ShopCampaign : ICampaign
 
                 if (!string.IsNullOrWhiteSpace(inputCampaignId))
                 {
-                    if (inputCampaignId == "0")
+                    if (string.Compare(inputCampaignId, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -379,7 +379,7 @@ public class ShopCampaign : ICampaign
 
                 if (!string.IsNullOrWhiteSpace(inputCampaignStartDate))
                 {
-                    if (inputCampaignStartDate == "0")
+                    if (string.Compare(inputCampaignStartDate, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -404,7 +404,7 @@ public class ShopCampaign : ICampaign
 
                 if (!string.IsNullOrWhiteSpace(inputCampaignEndDays))
                 {
-                    if (inputCampaignEndDays == "0")
+                    if (string.Compare(inputCampaignEndDays, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -433,7 +433,7 @@ public class ShopCampaign : ICampaign
 
                 if (!string.IsNullOrWhiteSpace(inputCampaignDiscount))
                 {
-                    if (inputCampaignDiscount == "0")
+                    if (string.Compare(inputCampaignDiscount, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }
@@ -488,7 +488,7 @@ public class ShopCampaign : ICampaign
     {
         while (true)
         {
-            ShopProduct ProductList = new ShopProduct();
+            Product.Product ProductList = new Product.Product();
 
             int campaignId;
 
@@ -498,7 +498,7 @@ public class ShopCampaign : ICampaign
             Console.WriteLine("KASSA - admin - (0 - Gå Tillbaka)\n");
             Console.WriteLine("  - Ta bort en kampanj -\n");
 
-            Console.WriteLine("    {0,-3} {1,-15} {2,-15} {3,-15} {4,-15} {5}\n", "Id", "Produktnamn", "Start", "Slut", "Pris", "Rabatt");
+            Console.WriteLine($"    {"Id",-3} {"Produktnamn",-15} {"Start",-15} {"Slut",-15} {"Pris",-15} {"Rabatt"}\n");
 
             if (campaignList.Count == 0)
             {
@@ -535,7 +535,7 @@ public class ShopCampaign : ICampaign
 
                 if (!string.IsNullOrWhiteSpace(inputCampaignId))
                 {
-                    if (inputCampaignId == "0")
+                    if (string.Compare(inputCampaignId, "0", StringComparison.Ordinal) == 0)
                     {
                         return;
                     }

@@ -51,7 +51,7 @@ public class Program
             Console.Write("Kommando:");
             string inputToCheck = Console.ReadLine();
 
-            if (inputToCheck.ToLower() == "pay")
+            if (string.Compare(inputToCheck.ToLower(), "pay", StringComparison.Ordinal) == 0)
             {
                 CashRegister.SaveReceipt();
                 CashRegister = new CashRegister();
@@ -71,8 +71,8 @@ public class Program
 
     private static void Admin()
     {
-        ShopProduct Product = new ShopProduct();
-        ShopCampaign Campaign = new ShopCampaign();
+        Product.Product Product = new Product.Product();
+        Campaign.Campaign Campaign = new Campaign.Campaign();
 
         while (true)
         {

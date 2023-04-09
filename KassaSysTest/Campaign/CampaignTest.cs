@@ -6,13 +6,13 @@ namespace KassaSys.Campaign;
 [TestClass]
 public class CampaignTest
 {
-	private readonly ShopCampaign sut;
-	private readonly ShopProduct sut2;
+	private readonly Campaign sut;
+	private readonly Product.Product sut2;
 
 	public CampaignTest()
 	{
-		sut = new ShopCampaign();
-		sut2 = new ShopProduct();
+		sut = new Campaign();
+        sut2 = new Product.Product();
 
 		sut.campaignList.Add(new CampaignList { Id = 1, ProductID = 1, StartDate = DateTime.Now.AddDays(-1), EndDate = 7, Discount = "4kr" });
 		sut.campaignList.Add(new CampaignList { Id = 2, ProductID = 1, StartDate = DateTime.Now, EndDate = 7, Discount = "50%" });

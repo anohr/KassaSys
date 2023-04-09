@@ -4,7 +4,7 @@ namespace KassaSys.Campaign
 {
     public interface ICampaign
     {
-        string CalculateBestDiscount(int productId, ShopProduct ProductList = null);
+        string CalculateBestDiscount(int productId, Product.Product ProductList = null);
 
         void AddCampaign();
 
