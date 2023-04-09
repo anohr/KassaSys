@@ -257,12 +257,16 @@ public class ShopCampaign : ICampaign
                     return;
                 }
 
+                inputCampaignDiscount = inputCampaignDiscount.Replace('.', ',');
+
                 double productPrice = productList.FetchProductPrice(productId);
 
                 if (inputCampaignDiscount.EndsWith("kr") && double.TryParse(inputCampaignDiscount.Replace("kr", ""), out double campaignDiscountMoney))
                 {
                     if (campaignDiscountMoney < productPrice)
                     {
+                        campaignDiscountMoney = Math.Round(campaignDiscountMoney, 2);
+
                         campaignDiscount = $"{campaignDiscountMoney}kr";
                         break;
                     }
@@ -425,7 +429,7 @@ public class ShopCampaign : ICampaign
                 var moneyRandom = discountRandom.Next(1, Convert.ToInt32(ProductList.FetchProductPrice(FetchProductIdFromCampaign(campaignId))));
                 var percentRandom = discountRandom.Next(1, 100);
 
-                inputCampaignDiscount = Program.AskForInput($"    Ange hur mycket rabatt [ex {moneyRandom}kr eller {percentRandom}%] ({FetchCampaignDiscount(campaignId)}): ");
+                inputCampaignDiscount = Program.AskForInput($"    Ange hur mycket rabatt [ex {moneyRandom},28kr eller {percentRandom}%] ({FetchCampaignDiscount(campaignId)}): ");
 
                 if (!string.IsNullOrWhiteSpace(inputCampaignDiscount))
                 {
@@ -434,6 +438,8 @@ public class ShopCampaign : ICampaign
                         return;
                     }
 
+                    inputCampaignDiscount = inputCampaignDiscount.Replace('.', ',');
+
                     int productId = FetchProductIdFromCampaign(campaignId);
                     double productPrice = ProductList.FetchProductPrice(productId);
 
@@ -441,6 +447,8 @@ public class ShopCampaign : ICampaign
                     {
                         if (campaignDiscountMoney < productPrice)
                         {
+                            campaignDiscountMoney = Math.Round(campaignDiscountMoney, 2);
+
                             campaignDiscount = $"{campaignDiscountMoney}kr";
                             break;
                         }

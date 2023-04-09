@@ -117,6 +117,8 @@ public class ShopProduct : IProducts
 
                 if (double.TryParse(inputProductPrice.Replace('.', ','), out productPrice) && productPrice > 0)
                 {
+                    productPrice = Math.Round(productPrice, 2);
+
                     break;
                 }
             }
