@@ -227,7 +227,7 @@ public class ShopProduct : IProducts
             {
                 var fetchedProductName = FetchProductName(productId);
 
-                productName = Program.AskForInput($"    Ange nytt produkt namn på  ({fetchedProductName}): ");
+                productName = Program.AskForInput($"    Ange nytt produkt namn på ({fetchedProductName}): ");
 
                 if (!string.IsNullOrWhiteSpace(productName))
                 {
@@ -252,7 +252,7 @@ public class ShopProduct : IProducts
             {
                 var fetcedProductPrice = FetchProductPrice(productId);
 
-                inputProductPrice = Program.AskForInput($"    Ange nytt produkt pris     ({fetcedProductPrice:F2}): ");
+                inputProductPrice = Program.AskForInput($"    Ange nytt produkt pris ({fetcedProductPrice:F2}): ");
 
                 if (!string.IsNullOrWhiteSpace(inputProductPrice))
                 {
@@ -280,7 +280,7 @@ public class ShopProduct : IProducts
             {
                 var fetchedProductType = FetchProductType(productId);
 
-                inputProductType = Program.AskForInput($"    Ange ny prisgrupp [{string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}] ({productType}): ");
+                inputProductType = Program.AskForInput($"    Ange ny prisgrupp [{string.Join(", ", System.Enum.GetNames(typeof(ProductType)))}] ({fetchedProductType}): ");
 
                 if (!string.IsNullOrWhiteSpace(inputProductType))
                 {
