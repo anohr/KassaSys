@@ -135,7 +135,7 @@ public class CashRegister : ICashRegister
 
             foreach (var item in receiptList)
             {
-                Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? item.Count + "*" + item.Price + "kr" : "", $"{Math.Round(item.Count * item.Price, 2):F2}");
+                Console.WriteLine("{0,-13}{1,-12}{2,9}", $"{item.Name.Substring(0, Math.Min(item.Name.Length, 11))}", (item.Count > 1) ? item.Count + "*" + item.Price : "", $"{Math.Round(item.Count * item.Price, 2):F2}");
 
                 if (item.Discount.EndsWith("kr") && item.Discount != "0kr")
                 {
