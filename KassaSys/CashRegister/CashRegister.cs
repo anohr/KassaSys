@@ -1,6 +1,4 @@
-﻿using KassaSys.Campaign;
-using KassaSys.Product;
-using KassaSys.Services;
+﻿using KassaSys.Services;
 
 namespace KassaSys.Register;
 
