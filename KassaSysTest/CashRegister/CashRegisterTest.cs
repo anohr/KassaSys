@@ -34,7 +34,7 @@ public class CashRegisterTest
         var productId = 2;
 
         // Act
-        var result = sut.CheckIfProductExicsts(productId);
+        var result = sut.CheckIfProductExists(productId);
 
         // Assert
         Assert.IsTrue(result);
@@ -47,7 +47,7 @@ public class CashRegisterTest
         var productId = 4;
 
         // Act
-        var result = sut.CheckIfProductExicsts(productId);
+        var result = sut.CheckIfProductExists(productId);
 
         // Assert
         Assert.IsFalse(result);
