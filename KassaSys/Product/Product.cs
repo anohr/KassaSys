@@ -1,10 +1,13 @@
 ﻿using KassaSys.Enum;
+using KassaSys.Services;
 
 namespace KassaSys.Product;
 
-public class Product : IProducts
+public class Product : IProduct
 {
-    private string _filePath = @".\product.txt";
+    private IFileService _fileService = new FileService();
+    private string _folder = "products";
+    private string _filePath = "products.txt";
     private string _splitString = " | ";
 
     public List<ProductList> productList = new List<ProductList>();
@@ -16,40 +19,14 @@ public class Product : IProducts
 
     public List<ProductList> FetchProductFromFile()
     {
-        var tempProductList = new List<ProductList>();
-
-        if (!File.Exists(_filePath))
-        {
-            return tempProductList;
-        }
-
-        tempProductList = File.ReadLines(_filePath)
-            .Select(line =>
-            {
-                var args = line.Split(_splitString);
-                return new ProductList
-                {
-                    Id = Convert.ToInt32(args[0]),
-                    Name = args[1],
-                    Price = Convert.ToDouble(args[2]),
-                    Type = (ProductType)System.Enum.Parse(typeof(ProductType), args[3])
-                };
-            })
-            .ToList();
-
-        return tempProductList;
+        return _fileService.ReadProductFile(_folder, _filePath);
     }
 
     private void SaveToFile(List<ProductList> tempProductList)
     {
         var stringList = tempProductList.Select(product => $"{product.Id}{_splitString}{product.Name}{_splitString}{product.Price}{_splitString}{product.Type}").ToList();
 
-        File.WriteAllLines(_filePath, stringList);
-    }
-
-    public List<ProductList> FetchList()
-    {
-        return FetchProductFromFile();
+        _fileService.SaveListToFile("products", "products.txt", stringList);
     }
 
     public string FetchProductName(int productId)

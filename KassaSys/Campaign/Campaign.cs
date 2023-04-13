@@ -1,10 +1,12 @@
-﻿using KassaSys.Product;
+﻿using KassaSys.Services;
 
 namespace KassaSys.Campaign;
 
 public class Campaign : ICampaign
 {
-    private string _filePath = @".\campaign.txt";
+    private IFileService _fileService = new FileService();
+    private string _folder = "campaign";
+    private string _filePath = "campaign.txt";
     private string _splitString = " | ";
 
     public List<CampaignList> campaignList = new List<CampaignList>();
@@ -16,34 +18,7 @@ public class Campaign : ICampaign
 
     public List<CampaignList> FetchCampaignFromFile()
     {
-        var tempCampaignList = new List<CampaignList>();
-
-        if (!File.Exists(_filePath))
-        {
-            return tempCampaignList;
-        }
-
-        tempCampaignList = File.ReadLines(_filePath)
-            .Select(line =>
-            {
-                var args = line.Split(_splitString);
-                return new CampaignList
-                {
-                    Id = Convert.ToInt32(args[0]),
-                    ProductID = Convert.ToInt32(args[1]),
-                    StartDate = Convert.ToDateTime(args[2]),
-                    EndDate = Convert.ToInt32(args[3]),
-                    Discount = args[4]
-                };
-            })
-            .ToList();
-
-        return tempCampaignList;
-    }
-
-    public List<CampaignList> FetchCampaignList()
-    {
-        return FetchCampaignFromFile();
+        return _fileService.ReadCampaignFile(_folder, _filePath);
     }
 
     public bool CheckIfCampaignExists(int campaignId)
@@ -77,7 +52,7 @@ public class Campaign : ICampaign
                                 .Where(campaign => campaign.ProductID == productId && campaign.Discount.Contains(typeOfDiscount) && (campaign.StartDate <= DateTime.Now && campaign.StartDate.AddDays(campaign.EndDate) >= DateTime.Now))
                                 .OrderByDescending(campaign => campaign.Discount.Replace(typeOfDiscount, ""))
                                 .Select(campaign => campaign.Discount)
-                                .SingleOrDefault();
+                                .FirstOrDefault();
 
         return bestDiscount ?? "0" + typeOfDiscount;
     }
@@ -103,9 +78,7 @@ public class Campaign : ICampaign
     {
         var stringList = tempCampaignList.Select(campaign => $"{campaign.Id}{_splitString}{campaign.ProductID}{_splitString}{campaign.StartDate}{_splitString}{campaign.EndDate}{_splitString}{campaign.Discount}").ToList();
 
-        File.WriteAllLines(_filePath, stringList);
-
-        campaignList = FetchCampaignFromFile();
+        _fileService.SaveListToFile(_folder, _filePath, stringList);
     }
 
     public void RemoveCampaign(int productId)
@@ -121,6 +94,7 @@ public class Campaign : ICampaign
     }
 
     #region AddCampaign
+
     public void AddCampaign()
     {
         Product.Product productList = new Product.Product();
@@ -143,7 +117,7 @@ public class Campaign : ICampaign
 
         Console.WriteLine($"    {"Id",-3} {"Produkt namn",-20} {"Pris",-9}\n");
 
-        if (productList.FetchList().Count == 0)
+        if (productList.FetchProductFromFile().Count == 0)
         {
             Console.WriteLine("     Inga produkter att lägga kampanj på...\n");
             Console.Write("    Tryck på valfri knapp för att återgå till menyn...");
@@ -153,9 +127,9 @@ public class Campaign : ICampaign
         }
         else
         {
-            for (int i = 0; i < productList.FetchList().Count; i++)
+            for (int i = 0; i < productList.FetchProductFromFile().Count; i++)
             {
-                var product = productList.FetchList()[i];
+                var product = productList.FetchProductFromFile()[i];
 
                 if (i % 2 == 0)
                 {
@@ -189,7 +163,6 @@ public class Campaign : ICampaign
 
             Program.ErrorPrint("     Felaktig inmatning. Försök igen.");
         }
-
 
         Console.Write("\n");
 
@@ -295,9 +268,11 @@ public class Campaign : ICampaign
 
         SaveToFile(campaignList);
     }
-    #endregion
+
+    #endregion AddCampaign
 
     #region UpdateCampaign
+
     public void UpdateCampaign()
     {
         while (true)
@@ -481,9 +456,11 @@ public class Campaign : ICampaign
             SaveToFile(campaignList);
         }
     }
-    #endregion
+
+    #endregion UpdateCampaign
 
     #region RemoveCampaign
+
     public void RemoveCampaign()
     {
         while (true)
@@ -557,5 +534,6 @@ public class Campaign : ICampaign
             SaveToFile(campaignList);
         }
     }
-    #endregion
+
+    #endregion RemoveCampaign
 }
