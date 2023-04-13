@@ -9,8 +9,6 @@ namespace KassaSys.Services
     {
         private const string _baseFolder = @".\outputs\";
 
-        public List<CampaignList> campaignList = new List<CampaignList>();
-
         public FileService()
         {
             if (!Directory.Exists(_baseFolder))
@@ -21,7 +19,7 @@ namespace KassaSys.Services
 
         public List<CampaignList> ReadCampaignFile(string folder, string fileName)
         {
-            var campaignList = new List<CampaignList>();
+            List<CampaignList> campaignList = new List<CampaignList>();
 
             if (!Directory.Exists($"{_baseFolder}\\{folder}"))
             {
@@ -55,7 +53,7 @@ namespace KassaSys.Services
 
         public List<ProductList> ReadProductFile(string folder, string fileName)
         {
-            var productList = new List<ProductList>();
+            List<ProductList> productList = new List<ProductList>();
 
             if (!Directory.Exists($"{_baseFolder}\\{folder}"))
             {
