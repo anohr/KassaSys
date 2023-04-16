@@ -278,6 +278,7 @@ public class Campaign : ICampaign
         while (true)
         {
             Product.Product ProductList = new Product.Product();
+            campaignList = FetchCampaignFromFile();
 
             string dateFormat = "yyyy-MM-dd";
 
