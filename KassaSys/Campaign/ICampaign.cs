@@ -1,6 +1,4 @@
-﻿using KassaSys.Product;
-
-namespace KassaSys.Campaign
+﻿namespace KassaSys.Campaign
 {
     public interface ICampaign
     {
